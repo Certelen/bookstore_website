@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% load thumbnail %}
+{% load static %}
+{% block content %}
+<div class="row">
+    <div id="carouselStocks" class="carousel slide col-12" data-bs-ride="carousel">
+        <div class="carousel-inner" style="border-radius: 50px;">
+            {% for banner in banners %}
+            <div class="carousel-item {% if forloop.first %} active {% endif %}">
+                <div class="carousel_banner">
+                    {% thumbnail banner.image "1200x300" crop="center" upscale=True as banner_image %}
+                    <img class="img_banner" src="{{ banner_image }}">
+                    {% endthumbnail %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="carousel-indicators">
+            {% for banner in banners %}
+            <button {% if forloop.first %} id="active" class="active" aria-current="true" {% endif %} type="button"
+                data-bs-slide-to="{{ forloop.counter0 }}" data-bs-target="#carouselStocks"></button>
+            {% endfor %}
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselStocks" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselStocks" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        </button>
+    </div>
+    <div class="col-12">
+        <div class="background-after mt-5">
+            <h1>Рекомендации</h1>
+            <div id="carouselRecommendations" class="owl-carousel">
+                {% for book in recomended %}
+                {% thumbnail book.main_image "x240" crop="center" upscale=True orientation=False as book_main_image %}
+                <div class="card" style="width: {{ book_main_image.width|add:'2' }}px;">
+                    {% include 'dynamic_forms/favorite.html' %}
+                    <div class="carousel-img">
+                        <img src="{{ book_main_image }}">
+                    </div>
+                    <div class="card-body pt-1 pe-1 ps-1 pb-0 justify-content-between d-flex flex-column">
+                        <span class="card-title mb-0 text-center"><b>{{ book.name }}</b></span>
+                        <span class="card-text text-center">{{ book.author }}</span>
+                        <div class="d-flex justify-content-between w-100">
+                            <div class="d-flex">
+                                <span class="ms-1" style="color:#FFFFFF">{{ book.price }} ₽</span>
+                            </div>
+                            <div class="d-flex">
+                                <span class="rating-result">★</span>
+                                <span class="rating-num">{{ book.score }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endthumbnail %}
+                {% empty %}
+                <h2 class="w-100 text-center">Нет подключения к БД или не созданы книги</h2>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="background-after mt-5">
+            <h1>Новинки</h1>
+            <div id="carouselRecommendations" class="owl-carousel">
+                {% for book in new %}
+                {% thumbnail book.main_image "x240" crop="center" upscale=True as book_main_image %}
+                <div class="card" style="width: {{ book_main_image.width|add:'2' }}px;">
+                    {% include 'dynamic_forms/favorite.html' %}
+                    <div class="carousel-img">
+                        <img src="{{ book_main_image }}" class="card-img-top" alt="...">
+                    </div>
+                    <div class="card-body pt-1 pe-1 ps-1 pb-0 justify-content-between d-flex flex-column">
+                        <span class="card-title mb-0 text-center"><b>{{ book.name }}</b></span>
+                        <span class="card-text text-center">{{ book.author }}</span>
+                        <div class="d-flex justify-content-between w-100">
+                            <div class="d-flex">
+                                <span class="ms-1" style="color:#FFFFFF">{{ book.price }} ₽</span>
+                            </div>
+                            <div class="d-flex">
+                                <span class="rating-result">★</span>
+                                <span class="rating-num">{{ book.score }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endthumbnail %}
+                {% empty %}
+                <h2 class="w-100 text-center">Нет подключения к БД или не созданы книги</h2>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="background-after mt-5">
+            <h1>Популярное</h1>
+            <div id="carouselRecommendations" class="owl-carousel">
+                {% for book in popular %}
+                {% thumbnail book.main_image "x240" crop="center" upscale=True as book_main_image %}
+                <div class="card" style="width: {{ book_main_image.width|add:'2' }}px;">
+                    {% include 'dynamic_forms/favorite.html' %}
+                    <div class="carousel-img">
+                        <img src="{{ book_main_image }}" class="card-img-top" alt="...">
+                    </div>
+                    <div class="card-body pt-1 pe-1 ps-1 pb-0 justify-content-between d-flex flex-column">
+                        <span class="card-title mb-0 text-center"><b>{{ book.name }}</b></span>
+                        <span class="card-text text-center">{{ book.author }}</span>
+                        <div class="d-flex justify-content-between w-100">
+                            <div class="d-flex">
+                                <span class="ms-1" style="color:#FFFFFF">{{ book.price }} ₽</span>
+                            </div>
+                            <div class="d-flex">
+                                <span class="rating-result">★</span>
+                                <span class="rating-num">{{ book.score }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endthumbnail %}
+                {% empty %}
+                <h2 class="w-100 text-center">Нет подключения к БД или не созданы книги</h2>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $(".owl-carousel").owlCarousel({
+            autoWidth: true,
+            margin: 10,
+        });
+    });
+</script>
+{% endblock %}

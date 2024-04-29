@@ -1,0 +1,24 @@
+<form id="signup-form" method="post" action="{% url 'users:signup' %}" name="signup">
+    {% for error in signup_form.non_field_errors %}
+    <div class="alert alert-danger">
+        {{ error|escape }}
+    </div>
+    {% endfor %}
+    {% csrf_token %}
+    {% for field in signup_form %}
+    {% for error in field.errors %}
+    <div class="alert alert-danger">
+        {{ error|escape }}
+    </div>
+    {% endfor %}
+    <div class="mb-3">
+        <label for="SignupInput" class="form-label">{{ field.label }}</label>
+        {{ field }}
+    </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-light mt-1 mb-3 shadow-none border-0">Зарегистрироваться</button>
+    <p class="pstyle">Зарегистрированы?
+        <a class="astyle" data-bs-target="#Login" data-bs-toggle="modal" data-bs-dismiss="modal"
+            style="cursor: pointer;">Войти</a>
+    </p>
+</form>

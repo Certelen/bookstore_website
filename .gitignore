@@ -1,3 +1,13 @@
+# custom
+migrations
+tests.py
+tests
+media
+cache
+.vscode
+data
+management
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    {% include 'includes/settings.html' %}
+    <title>
+        Bookstore
+    </title>
+</head>
+
+<body>
+    <header>
+        {% include 'includes/header.html' %}
+    </header>
+
+    <main class="container">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer class="footer">
+        {% include 'includes/footer.html' %}
+    </footer>
+    <script src="../static/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

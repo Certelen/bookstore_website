@@ -1,0 +1,169 @@
+{% load static %}
+{% if user.is_authenticated %}
+<script>
+    // Добавление в избранное
+    $(document).on("submit", "#add_favorite_form", function () {
+        var form = $(this)
+        var name = $(this).attr('name')
+        $.ajax({
+            type: 'POST',
+            url: $(this).attr('action'),
+            data: $(this).serialize(),
+            success: function (html) {
+                $('form[name=' + name + ']').each(function () {
+                    $(this).replaceWith(html)
+                });
+
+            }
+        });
+        return false;
+    });
+</script>
+{% else %}
+<script>
+    // Передача данных модальной формы на сервер
+    $(document).on("submit", "#login-form, #signup-form", function () {
+        name = $(this).attr('name')
+        $parent = $(this).parent()
+        $.ajax({
+            type: 'POST',
+            url: $(this).attr('action'),
+            data: $(this).serialize(),
+            success: function (html) {
+                if (html['login']) {
+                    location.reload(true)
+                }
+                else {
+                    $('#' + name + '-form').remove()
+                    $parent.append(html)
+                }
+            },
+
+        });
+        return false;
+    });
+</script>
+<script>
+    // Добавление в избранное неавторизованым выдает сообщение
+    // Клик неавторизованного по корзине/избранному/библиотеке выдает сообщение
+    $(function () {
+        $('#favorites, #cart, #library, .favorite-button').click(function () {
+            var toastElList = [].slice.call(document.querySelectorAll('.toast'))
+            console.log(toastElList)
+            var toastList = toastElList.map(function (toastEl) {
+                return new bootstrap.Toast(toastEl)
+            })
+            console.log(toastList)
+            toastList.forEach(toast => toast.show())
+            return false
+        });
+    });
+</script>
+{% for _ in '01' %}
+<div class="modal fade modal-fullscreen col-12" {% if forloop.first %} id="Login" aria-labelledby="Login" {% else %}
+    id="Signup" aria-labelledby="Signup" {% endif %} tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body d-flex flex-column align-items-end">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="myform w-100">
+                    {% if forloop.first %}
+                    <h1 class="text-center h1style">Авторизация</h1>
+                    {% include 'dynamic_forms/auth.html' %}
+                    {% else %}
+                    <h1 class="text-center h1style">Регистрация</h1>
+                    {% include 'dynamic_forms/signup.html' %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+<div class="toast align-items-center" role="alert" aria-live="assertive" aria-atomic="true"
+    style="position: absolute; top: 10px; right: 10px; z-index: 2000;">
+    <div class="d-flex">
+        <div class="toast-body">
+            Войдите или зарегистрируйтесь!
+        </div>
+        <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Закрыть"></button>
+    </div>
+</div>
+{% endif %}
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top navbarstyle">
+    <div id="top_flex lg-header-panel" class="container-fluid">
+        <button class="navbar-toggler shadow-none border-0 col-2 pt-1" type="button" data-bs-toggle="collapse"
+            data-bs-target=".multi-collapse" aria-controls="BooksLinks ProfileLinks" aria-expanded="false"
+            aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <a class="fs-5 text-light d-flex justify-content-center col-4 offset-2 offset-lg-0 col-lg-1 order-1"
+            data-bs-toggle="tooltip" data-bs-placement="bottom" title="Перейти на главную страницу"
+            href="{% url 'books:index'%}">Bookstore
+        </a>
+        <a class="nav-link d-flex text-reset flex-column align-items-center pb-1 col-2 offset-2 d-lg-none order-2 blank_space"
+            {% if user.is_authenticated %} href="{% url 'books:index'%}" title="Профиль" {% else %}
+            data-bs-toggle="modal" data-bs-target="#Login" href="#Login" title="Войти или зарегистрироваться"
+            blank_space {% endif %}>
+            <img src="{% static 'icons/profile.svg' %}" class="icon-img nav-icon" alt="profile icon"></img>
+        </a>
+        <div class="collapse multi-collapse navbar-collapse show order-2 col-lg-6" id="BooksLinks">
+            <div class="row d-flex flex-fill align-items-center">
+                <div class="order-2 col-lg-8">
+                    <div class="d-flex input-group">
+                        <form
+                            class="w-100 align-items-center justify-content-center shadow-none border-0 lg-me-3 d-flex"
+                            style="background-color: white; border-radius: 10px;" method="post"
+                            enctype="multipart/form-data" action="{% url 'books:search'%}">
+                            {% csrf_token %}
+                            {% for field in search_form %}
+                            {{ field }}
+                            <span class="input-group-append">
+                                <button type="submit" class="btn search_icon shadow-none border-0 d-none d-lg-block"
+                                    data-bs-toggle="tooltip" data-bs-placement="bottom"
+                                    title="Нажмите, чтобы начать поиск">
+                                    <img src="{% static 'icons/loupe.svg' %}" class="icon-img nav-icon"
+                                        alt="profile icon"></img>
+                                </button>
+                            </span>
+                            {% endfor %}
+                        </form>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-around order-1 d-flex justify-content-between col-lg-4 mb-2">
+                    <a class="nav-link text-light lg-ms-3 lg-me-3" href="{% url 'books:news'%}">Новинки</a>
+                    <a class="nav-link text-light" href="{% url 'books:catalog'%}">Каталог</a>
+                </div>
+            </div>
+        </div>
+        <div class="collapse multi-collapse navbar-collapse col-lg-3 order-4" id="ProfileLinks">
+            <div class="d-flex justify-content-around d-flex justify-content-between w-100">
+                <a id="library" class="nav-link d-flex text-reset flex-column align-items-center lg-me-3"
+                    data-bs-toggle="tooltip" data-bs-placement="bottom" title="Просмотр купленных книг" href="#">
+                    <img src="{% static 'icons/library.svg' %}" class="icon-img nav-icon" alt="library icon"></img>
+                    <span class="d-sm-inline text-white">Библиотека</span>
+                </a>
+                <a id="favorites" class="nav-link d-flex text-reset flex-column align-items-center lg-me-3"
+                    data-bs-toggle="tooltip" data-bs-placement="bottom" title="Просмотр избранного"
+                    href="{% url 'users:favorite' %}">
+                    <img src="{% static 'icons/favorite.svg' %}" class="icon-img nav-icon" alt="favorite icon"></img>
+                    <span class="d-sm-inline text-white">Избранное</span>
+                </a>
+                <a id="cart" class="nav-link d-flex text-reset flex-column align-items-center lg-me-3"
+                    data-bs-toggle="tooltip" data-bs-placement="bottom" title="Перейти в корзину" href="#">
+                    <img src="{% static 'icons/cart.svg' %}" class="icon-img nav-icon" alt="cart icon"></img>
+                    <span class="d-sm-inline text-white">Корзина</span>
+                </a>
+                <a class="nav-link d-flex text-reset flex-column align-items-center d-none d-lg-flex blank_space blank_space"
+                    {% if user.is_authenticated %} href="{% url 'books:index'%}" title="Профиль" {% else %}
+                    data-bs-toggle="modal" data-bs-target="#Login" href="#Login" title="Войти или зарегистрироваться"
+                    blank_space {% endif %}>
+                    <img src="{% static 'icons/profile.svg' %}" class="icon-img nav-icon" alt="profile icon"></img>
+                    <span class="d-sm-inline text-white ">
+                        {% if user.is_authenticated %}Профиль{% else %}Войти{% endif %}
+                    </span>
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>

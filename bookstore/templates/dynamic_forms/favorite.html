@@ -1,0 +1,13 @@
+{% load static %}
+<form id="add_favorite_form" name="{{ book.id }}" method="post" action="{% url 'books:change_favorite'%}">
+    {% csrf_token %}
+    <input value="{{ book.id }}" name="book" hidden>
+    <button class="favorite-button">
+        {% if book.id in favorite_books %}
+
+        <img src="{% static '/icons/del_favorite.svg' %}">
+        {% else %}
+        <img src="{% static '/icons/add_favorite.svg' %}">
+        {% endif %}
+    </button>
+</form>

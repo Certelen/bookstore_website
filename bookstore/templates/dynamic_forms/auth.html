@@ -1,0 +1,26 @@
+<form id="login-form" method="post" action="{% url 'users:login' %}" name="login">
+    {% for error in auth_form.non_field_errors %}
+    <div class="alert alert-danger">
+        {{ error|escape }}
+    </div>
+    {% endfor %}
+    {% csrf_token %}
+    {% for field in auth_form %}
+    {% for error in field.errors %}
+    <div class="alert alert-danger">
+        {{ error|escape }}
+    </div>
+    {% endfor %}
+    <div class="mb-3">
+        <label for="LoginInput" class="form-label">{{ field.label }}</label>
+        {{ field }}
+        <!-- <input type="text" class="form-control text-white" id="LoginInput" name="username" aria-describedby="emailHelp"> -->
+    </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-light mt-1 mb-3 shadow-none border-0">Войти</button>
+    <p class="pstyle">Не зарегистрированы?
+        <a class="astyle" data-bs-target="#Signup" data-bs-toggle="modal" data-bs-dismiss="modal"
+            style="cursor: pointer;">Зарегистрируйтесь прямо
+            сейчас!</a>
+    </p>
+</form>
