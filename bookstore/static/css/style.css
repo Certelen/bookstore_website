@@ -123,7 +123,7 @@ main {
     background-color: #EDC7B7;
     border-radius: 20px;
     padding: 1rem;
-    height: 418px;
+    min-height: min-content;
 }
 
 #carouselStocks {
@@ -205,8 +205,8 @@ main {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 5vh;
-    height: 5vh;
+    width: 50px;
+    height: 50px;
     position: absolute;
     background-color: #FFFFFF70 !important;
     border-radius: 20px;
@@ -241,6 +241,8 @@ main {
     color: white !important;
     border-radius: 10px !important;
     overflow: hidden !important;
+    text-decoration: none !important;
+
 }
 
 .card-title {
@@ -310,13 +312,13 @@ main {
     font-size: 20px;
     margin: 0 3px;
     line-height: 1;
-    color: gold;
+    color: orange;
 }
 
 .rating-num {
     font-size: 14px;
     margin: 0 3px;
-    color: gold;
+    color: orange;
 }
 
 #filters input::placeholder {
@@ -339,4 +341,91 @@ main {
     justify-content: center;
     border-radius: 5px;
     margin-right: 5px;
+}
+
+.book_images,
+.book_other_images {
+    border: 5px solid #123C69;
+    border-radius: 15px;
+    overflow: hidden;
+    height: min-content;
+    width: 100%;
+    background-color: #EEE2DC;
+}
+
+.book_other_images {
+    justify-content: center;
+    align-items: center;
+}
+
+.book_images_image {
+    border: 1px solid #AC3B61;
+    border-radius: 5px;
+    width: 50px;
+    height: 50px;
+    overflow: hidden;
+}
+
+.border-line {
+    height: 1rem;
+    width: 1px;
+    background-color: black;
+}
+
+.rating-area:not(:checked)>input {
+    display: none;
+}
+
+.rating-area:not(:checked)>label {
+    float: right;
+    width: 42px;
+    padding: 0;
+    cursor: pointer;
+    font-size: 32px;
+    color: lightgrey;
+}
+
+.rating-area:not(:checked)>label:before {
+    content: '★';
+}
+
+.rating-area>input:checked~label {
+    color: orange;
+}
+
+.rating-area:not(:checked)>label:hover,
+.rating-area:not(:checked)>label:hover~label {
+    color: gold;
+}
+
+.rating-area>input:checked+label:hover,
+.rating-area>input:checked+label:hover~label,
+.rating-area>input:checked~label:hover,
+.rating-area>input:checked~label:hover~label,
+.rating-area>label:hover~input:checked~label {
+    color: orange;
+}
+
+.rate-area>label:active {
+    position: relative;
+}
+
+.rating-result {
+    margin: 0 auto;
+    text-align: center;
+}
+
+.rating-result span {
+    padding: 0;
+    font-size: 32px;
+    margin: 0 3px;
+    color: lightgrey;
+}
+
+.rating-result>span:before {
+    content: '★';
+}
+
+.rating-result>span.active {
+    color: orange;
 }

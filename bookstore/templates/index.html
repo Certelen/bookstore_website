@@ -34,7 +34,8 @@
             <div id="carouselRecommendations" class="owl-carousel">
                 {% for book in recomended %}
                 {% thumbnail book.main_image "x240" crop="center" upscale=True orientation=False as book_main_image %}
-                <div class="card" style="width: {{ book_main_image.width|add:'2' }}px;">
+                <a class="card" style="width: {{ book_main_image.width|add:'2' }}px;"
+                    href="{% url 'books:book' book.id %}">
                     {% include 'dynamic_forms/favorite.html' %}
                     <div class="carousel-img">
                         <img src="{{ book_main_image }}">
@@ -52,7 +53,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </a>
                 {% endthumbnail %}
                 {% empty %}
                 <h2 class="w-100 text-center">Нет подключения к БД или не созданы книги</h2>
@@ -65,7 +66,8 @@
             <div id="carouselRecommendations" class="owl-carousel">
                 {% for book in new %}
                 {% thumbnail book.main_image "x240" crop="center" upscale=True as book_main_image %}
-                <div class="card" style="width: {{ book_main_image.width|add:'2' }}px;">
+                <a class="card" style="width: {{ book_main_image.width|add:'2' }}px;"
+                    href="{% url 'books:book' book.id %}">
                     {% include 'dynamic_forms/favorite.html' %}
                     <div class="carousel-img">
                         <img src="{{ book_main_image }}" class="card-img-top" alt="...">
@@ -83,7 +85,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </a>
                 {% endthumbnail %}
                 {% empty %}
                 <h2 class="w-100 text-center">Нет подключения к БД или не созданы книги</h2>
@@ -95,12 +97,13 @@
             <div id="carouselRecommendations" class="owl-carousel">
                 {% for book in popular %}
                 {% thumbnail book.main_image "x240" crop="center" upscale=True as book_main_image %}
-                <div class="card" style="width: {{ book_main_image.width|add:'2' }}px;">
+                <div class="card" style="width: {{ book_main_image.width|add:'2' }}px;"
+                    href="{% url 'books:book' book.id %}">
                     {% include 'dynamic_forms/favorite.html' %}
                     <div class="carousel-img">
                         <img src="{{ book_main_image }}" class="card-img-top" alt="...">
                     </div>
-                    <div class="card-body pt-1 pe-1 ps-1 pb-0 justify-content-between d-flex flex-column">
+                    <a class="card-body pt-1 pe-1 ps-1 pb-0 justify-content-between d-flex flex-column">
                         <span class="card-title mb-0 text-center"><b>{{ book.name }}</b></span>
                         <span class="card-text text-center">{{ book.author }}</span>
                         <div class="d-flex justify-content-between w-100">
@@ -112,7 +115,7 @@
                                 <span class="rating-num">{{ book.score }}</span>
                             </div>
                         </div>
-                    </div>
+                    </a>
                 </div>
                 {% endthumbnail %}
                 {% empty %}
@@ -127,6 +130,7 @@
         $(".owl-carousel").owlCarousel({
             autoWidth: true,
             margin: 10,
+            nav: true
         });
     });
 </script>

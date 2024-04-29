@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="ru">
 
@@ -21,7 +22,7 @@
     <footer class="footer">
         {% include 'includes/footer.html' %}
     </footer>
-    <script src="../static/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 </body>
 
 </html>

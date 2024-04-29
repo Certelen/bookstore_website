@@ -50,12 +50,13 @@ def index(request):
     user = request.user
     popular = Book.objects.all().order_by('-buying')
     new = Book.objects.filter(created__gte=date.today() - timedelta(days=7))
+    recomended = Book.objects.all().order_by('-score')
+    favorite_books = None
     if not new:
         new = Book.objects.order_by('created')
     if user.is_authenticated:
         if user.viewed_genres:
             recomended = popular.filter(genre=user.most_viewed_genres)
-        recomended = Book.objects.all().order_by('-score')
         favorite_books = user.favorite_books.all().values_list('id', flat=True)
 
     context = {
@@ -75,6 +76,7 @@ def search(request, sort='buying'):
     data = request.POST
     filter_dict = {}
     books_list = []
+    favorite_books = None
     if request.method == 'POST':
         if data['search_word']:
             books_list = Book.objects.filter(
@@ -121,6 +123,7 @@ def search(request, sort='buying'):
 def catalog(request, sort='buying'):
     user = request.user
     books_list = Book.objects.all()
+    favorite_books = None
     filter_dict = {
         'sort': sort
     }
@@ -158,6 +161,7 @@ def news(request, sort='min_created'):
     user = request.user
     books_list = Book.objects.filter(
         created__gte=date.today() - timedelta(days=7))
+    favorite_books = None
     filter_dict = {
         'sort': sort
     }
@@ -192,22 +196,25 @@ def news(request, sort='min_created'):
     return TemplateResponse(request, 'books/news.html', context)
 
 
-def book_detail(request, book_id):
+def book_detail(request, book_id, book_status=0):
+    user = request.user
     book = get_object_or_404(Book, id=book_id)
     images = [book.main_image]
     images += [obj.image for obj in book.images.all()]
     if request.user.is_authenticated:
-        order = get_object_or_404(request.user.order, close=False)
-        book_order = order.book.filter(book=book)
-    comments = Review.objects.filter(book=book)
+        order = user.order.filter(close=False)[0]
+        book_status = 2 if user.buyed_books.filter(id=book_id) else 0
+        if not book_status:
+            book_status = 1 if order.book.filter(id=book_id) else 0
+    reviews = Review.objects.filter(book=book)
     context = {
         'book': book,
         'images': images,
-        'book_order': bool(book_order),
-        'comments': comments
+        'book_status': book_status,
+        'reviews': reviews
     }
     context.update(forms)
-    return TemplateResponse(request, 'books/book-detail.html', context)
+    return TemplateResponse(request, 'books/book_detail.html', context)
 
 
 @login_required
@@ -230,3 +237,32 @@ def change_favorite(request):
             request, 'dynamic_forms/favorite.html', context
         )
     return reverse_lazy('books:index')
+
+
+@login_required
+def change_cart(request, book_status=0):
+    if request.method == "POST":
+        user = request.user
+        data = request.POST
+        book = get_object_or_404(Book, id=data['book'])
+        if user.buyed_books.filter(id=data['book']):
+            context = {
+                'book': book,
+                'book_status': 2
+            }
+            return TemplateResponse(
+                request, 'dynamic_forms/cart.html', context
+            )
+        order = user.order.filter(close=False)[0]
+        book_order = order.book.filter(id=data['book'])
+        if book_order:
+            order.book.remove(book)
+        else:
+            book_status = 1
+            order.book.add(book)
+        context = {
+            'book': book,
+            'book_status': book_status
+        }
+        return TemplateResponse(request, 'dynamic_forms/cart.html', context)
+    return reverse_lazy('products:index')

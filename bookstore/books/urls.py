@@ -18,11 +18,11 @@ urlpatterns = [
         'change_favorite', views.change_favorite, name='change_favorite'
     ),
     path(
+        'change_cart', views.change_cart, name='change_cart'
+    ),
+    path(
         'search', views.search, name='search'
     ),
-    # path(
-    #     'change_cart', views.change_cart, name='change_cart'
-    # ),
     path(
         'book/<int:book_id>/', views.book_detail, name='book'
     ),

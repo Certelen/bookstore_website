@@ -15,4 +15,7 @@ urlpatterns = [
     path(
         'favorite', views.favorite, name='favorite'
     ),
+    path(
+        'review/<int:book_id>/', views.review, name='review'
+    ),
 ]

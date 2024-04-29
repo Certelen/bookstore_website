@@ -110,11 +110,6 @@ class Review(models.Model):
         related_name='review',
         verbose_name='Книга на которую оставляется отзыв',
     )
-    title = models.CharField(
-        'Заголовок отзыва',
-        help_text='Заголовок отзыва',
-        max_length=50,
-    )
     comment = models.TextField(
         'Текст отзыва',
         help_text='Текст отзыва',
@@ -153,6 +148,11 @@ class Order(models.Model):
         related_name='order',
         verbose_name='Книги',
         blank=True
+    )
+    close = models.BooleanField(
+        'Возможность изменять заказ',
+        help_text='Возможность изменять заказ',
+        default=False,
     )
     close_data = models.DateField(
         "Дата покупки",

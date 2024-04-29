@@ -1,14 +1,16 @@
 import django.contrib.auth as auth
 from django.template.response import TemplateResponse
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.http import JsonResponse
 from http import HTTPStatus
 from django.contrib.auth.forms import AuthenticationForm
 
-from books.models import Genre
+from books.models import Genre, Book
 from books.views import filter_books, forms
 from .forms import SignupForm
+from .models import Review
 
 
 def signup(request):
@@ -74,3 +76,24 @@ def favorite(request, sort='buying'):
     }
     context.update(forms)
     return TemplateResponse(request, 'users/favorite.html', context)
+
+
+@login_required
+def review(request, book_id):
+    book = get_object_or_404(Book, id=book_id)
+    if request.method == 'POST':
+        data = request.POST
+        score = int(data['score'])
+        if 0 >= score > 5:
+            score = 5
+        Review.objects.create(
+            user=request.user,
+            book=book,
+            comment=data['text'],
+            score=score
+        )
+        score_list = [review.score for review in book.review.all()]
+        book.score = sum(score_list) / len(score_list)
+        book.save()
+        return JsonResponse(status=HTTPStatus.OK, data={})
+    return reverse_lazy('products:index')

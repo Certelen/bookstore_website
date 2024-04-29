@@ -1,5 +1,5 @@
 {% load static %}
-<form id="add_favorite_form" name="{{ book.id }}" method="post" action="{% url 'books:change_favorite'%}">
+<form class="add_favorite_form" name="{{ book.id }}" method="post" action="{% url 'books:change_favorite'%}">
     {% csrf_token %}
     <input value="{{ book.id }}" name="book" hidden>
     <button class="favorite-button">

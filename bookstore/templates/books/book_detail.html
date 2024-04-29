@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+{% if user.is_authenticated %}
+<script>
+    // Клик авторизованного по корзине/избранному
+    $(document).on("submit", "#cart_form", function () {
+        var form = $(this)
+        $.ajax({
+            type: 'POST',
+            url: $(this).attr('action'),
+            data: $(this).serialize(),
+            success: function (html) {
+                form.replaceWith(html)
+            }
+        });
+        return false;
+    });
+</script>
+<script>
+    // Отправка отзыва на сервер. При ошибке (Недостаточно символов) выдает уведомление. При успехе - перезагрузка страницы.
+    $(document).ready(function () {
+        $('#comment-form').submit(function () {
+            $.ajax({
+                type: 'POST',
+                url: $(this).attr('action'),
+                data: $(this).serialize(),
+                success: function (html) {
+                    location.reload(true)
+                }
+            });
+            return false;
+        });
+    });
+</script>
+{% endif %}
+<script>
+    // Переключение изображений при нажатии на их миниатюры.
+    $(document).ready(function () {
+        $('#other_images div img').on({
+            click: function () {
+                let thumbnailURL = $(this).attr('src');
+                $('#main_image img').fadeOut(200, function () {
+                    $(this).attr('src', thumbnailURL);
+                }).fadeIn(200);
+            }
+        });
+    }); 
+</script>
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'books:index' %}">Главная</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'books:catalog' %}">Каталог</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ book.name }}</li>
+    </ol>
+</nav>
+<div class="row">
+    <div class="col-12 background-after" style="height: unset;">
+        <div class="row">
+            <div class="col-12 mb-3 col-lg-3 order-1">
+                <div class="d-flex flex-column justify-content-center">
+                    <div id="main_image" class="mb-1 book_images d-flex align-items-center justify-content-center">
+                        <img style="width: 100%;" src="{{ book.main_image.url }}" />
+                    </div>
+                    <div class="mb-3 px-5 book_other_images">
+                        <div id="other_images" data-bs-ride="carousel"
+                            class="carousel slide  d-flex flex-column justify-content-between align-items-center">
+                            {% for image in images %}
+                            <div class="book_images_image d-flex justify-content-center" style="max-height: 70.63px;">
+                                <img style="max-width: 50px; max-height: 50px; " src="{{ image.url }}" />
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="w-100 book_other_images d-flex justify-content-around"
+                        style="font-weight: 600; font-size: 20px;">
+                        <div class="d-flex flex-column align-items-center">
+                            <div>
+                                <span class="rating-result">★</span>
+                                <span>{{ book.score }}</span>
+                            </div>
+                        </div>
+                        <div class="border-line"></div>
+                        <div class="d-flex flex-column align-items-center">
+                            <span>{{ reviews.count }}</span>
+                            <span>отзыва</span>
+                        </div>
+                        <div class="border-line"></div>
+                        <div class="d-flex flex-column align-items-center">
+                            <span>{{ book.buying}}</span>
+                            <span>куплено</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 mb-3 col-lg-6 order-3 order-lg-2">
+                <div class="d-flex px-2 mb-3 flex-column justify-content-center book_images">
+                    <h1>{{ book.name }}</h1>
+                    <div class="d-flex align-items-baseline">
+                        <span class="me-1" style="font-size:30px;">Авторы:</span>
+                        <span style="font-size:20px;">{{ book.author }}</span>
+                    </div>
+                    <span style="font-size:25px;">Описание:</span>
+                    <span style="font-size:18px;">{{ book.description }}</span>
+                </div>
+                {% if user.is_authenticated %}
+                <div class="d-flex mb-3 p-2 flex-column justify-content-center book_images">
+                    <form id="comment-form" class="d-flex flex-column" method="post"
+                        action="{% url 'users:review' book.id %}">
+                        {% csrf_token %}
+                        <h4>Оставить отзыв:</h4>
+                        <div class="rating-area mb-0" style="width: max-content;">
+                            <input type="radio" id="star-5" name="score" checked="checked" value="5">
+                            <label for="star-5" title="Оценка «5»"></label>
+                            <input type="radio" id="star-4" name="score" value="4">
+                            <label for="star-4" title="Оценка «4»"></label>
+                            <input type="radio" id="star-3" name="score" value="3">
+                            <label for="star-3" title="Оценка «3»"></label>
+                            <input type="radio" id="star-2" name="score" value="2">
+                            <label for="star-2" title="Оценка «2»"></label>
+                            <input type="radio" id="star-1" name="score" value="1">
+                            <label for="star-1" title="Оценка «1»"></label>
+                        </div>
+                        <div class="w-100">
+                            <textarea id="comment-area" class="w-100 rounded-3" name="text"></textarea>
+                        </div>
+                        <button id="comment-button" type="submit" class="btn" style="background-color: #123C69;">
+                            <span style="color: white;">
+                                Сохранить
+                            </span>
+                        </button>
+                    </form>
+                </div>
+                {% endif %}
+                <div class="d-flex p-2 flex-column justify-content-center book_images">
+                    <h1 class="m-0">Отзывы</h1>
+                    {% for review in reviews %}
+                    <div class="rounded-3 d-flex flex-column p-3 mt-2" style="border: 2px #BAB2B5 solid">
+                        <div class="d-flex justify-content-between">
+                            <h5>{{ review.user }}</h5>
+                            <div class="rating-result m-0">
+                                <span class="{% if review.score >= 1 %}active{% endif %}"></span>
+                                <span class="{% if review.score >= 2 %}active{% endif %}"></span>
+                                <span class="{% if review.score >= 3 %}active{% endif %}"></span>
+                                <span class="{% if review.score >= 4 %}active{% endif %}"></span>
+                                <span class="{% if review.score == 5 %}active{% endif %}"></span>
+                            </div>
+                        </div>
+                        <span>{{ review.comment }}</span>
+                    </div>
+                    {% empty %}
+                    <span style="font-size: 18px;">Пока никто не оставил отзыва.</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="col-12 mb-3 col-lg-3 order-2 order-lg-3">
+                <div class="d-flex p-2 flex-column align-items-center justify-content-center book_images">
+                    <h1>{{ book.price }} ₽</h1>
+                    {% include 'dynamic_forms/cart.html' %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+    .owl-nav {
+        width: 100%;
+        height: 100%;
+    }
+
+    .owl-nav button {
+        top: 0;
+        right: -46px;
+    }
+
+    .owl-nav .owl-prev {
+        right: unset;
+        left: -46px;
+    }
+
+    .owl-stage-outer {
+        width: 94% !important;
+    }
+</style>
+<script>
+    $(document).ready(function () {
+        $("#other_images").owlCarousel({
+            items: 4,
+            autoWidth: true,
+            margin: 10,
+            nav: true,
+            dots: false
+        });
+    });
+</script>
+{% endblock %}

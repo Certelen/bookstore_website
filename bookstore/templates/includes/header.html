@@ -2,7 +2,7 @@
 {% if user.is_authenticated %}
 <script>
     // Добавление в избранное
-    $(document).on("submit", "#add_favorite_form", function () {
+    $(document).on("submit", ".add_favorite_form", function () {
         var form = $(this)
         var name = $(this).attr('name')
         $.ajax({
