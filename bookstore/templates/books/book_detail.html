@@ -36,16 +36,26 @@
 {% endif %}
 <script>
     // Переключение изображений при нажатии на их миниатюры.
+
     $(document).ready(function () {
-        $('#other_images div img').on({
-            click: function () {
-                let thumbnailURL = $(this).attr('src');
+        var now_img = 0
+        var imgs_list = document.getElementsByClassName('owl-item')
+        $(document).on('click', '.owl-nav button', function () {
+            console.log(1)
+            if ($(this).hasClass('disabled')) {
+                return
+            } else {
+                if ($(this).hasClass('owl-next')) {
+                    now_img += 1
+                } else { now_img -= 1 }
+                let thumbnailURL = imgs_list[now_img].children[0].children[0].src
+                console.log(thumbnailURL)
                 $('#main_image img').fadeOut(200, function () {
                     $(this).attr('src', thumbnailURL);
                 }).fadeIn(200);
             }
         });
-    }); 
+    });
 </script>
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
@@ -67,7 +77,8 @@
                             class="carousel slide  d-flex flex-column justify-content-between align-items-center">
                             {% for image in images %}
                             <div class="book_images_image d-flex justify-content-center" style="max-height: 70.63px;">
-                                <img style="max-width: 50px; max-height: 50px; " src="{{ image.url }}" />
+                                <img style="max-width: 50px; max-height: 50px;" name="{{forloop.counter0}}"
+                                    src="{{ image.url }}" />
                             </div>
                             {% endfor %}
                         </div>
@@ -79,6 +90,7 @@
                                 <span class="rating-result">★</span>
                                 <span>{{ book.score }}</span>
                             </div>
+                            <span>оценка</span>
                         </div>
                         <div class="border-line"></div>
                         <div class="d-flex flex-column align-items-center">
@@ -109,8 +121,8 @@
                         <span style="font-size:18px;">В книге {{ book.pages }} страниц</span>
                         <span style="font-size:18px;">Выпущена {{ book.release|date:"d.m.Y" }}</span>
                         <span style="font-size:18px;">Добавлена на сайт {{ book.created|date:"d.m.Y" }}</span>
-                        <span style="font-size:18px;">Для скачивания доступны PDF, FB2, EPUB, MOBI, IOS.EPUB
-                            форматы</span>
+                        <span style="font-size:18px;">Для скачивания доступны: {% for format in files_format %}
+                            {{format}}{% if not forloop.last %},{% endif %}{% endfor %}</span>
                     </div>
                 </div>
                 <div class="mb-3 book_images">
@@ -173,7 +185,7 @@
                                 <span class="{% if review.score == 5 %}active{% endif %}"></span>
                             </div>
                         </div>
-                        <span>{{ review.comment }}</span>
+                        <span style="overflow-wrap: break-word;">{{ review.comment }}</span>
                     </div>
                     {% empty %}
                     <span style="font-size: 18px;">Пока никто не оставил отзыва.</span>
@@ -215,7 +227,7 @@
     $(document).ready(function () {
         $("#other_images").owlCarousel({
             items: 4,
-            autoWidth: true,
+            center: true,
             margin: 10,
             nav: true,
             dots: false

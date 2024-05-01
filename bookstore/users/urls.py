@@ -10,6 +10,9 @@ urlpatterns = [
         'login', views.login, name='login'
     ),
     path(
+        'logout', views.logout, name='logout'
+    ),
+    path(
         'signup', views.signup, name='signup'
     ),
     path(
@@ -36,5 +39,4 @@ urlpatterns = [
     path(
         'get_book/<int:book_id>/<str:format>', views.get_book, name='get_book'
     ),
-
 ]

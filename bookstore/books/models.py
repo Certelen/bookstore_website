@@ -1,5 +1,8 @@
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.exceptions import ValidationError
+from django.dispatch import receiver
+from django.db.models.signals import pre_delete, pre_save
 
 import books.validator as val
 
@@ -17,6 +20,36 @@ class Genre(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class BookFiles(models.Model):
+    book = models.ForeignKey(
+        'Book',
+        on_delete=models.CASCADE,
+        related_name='files',
+        verbose_name='Книга',
+    )
+    name = models.CharField(
+        'Формат файла',
+        max_length=8,
+        choices=[
+            ('PDF', 'PDF'),
+            ('FB2', 'FB2'),
+            ('IOS.EPUB', 'IOS.EPUB'),
+            ('EPUB', 'EPUB'),
+            ('MOBI', 'MOBI')
+        ]
+    )
+    file = models.FileField(
+        unique=True,
+        upload_to=val.book_directory_path,
+        validators=[val.validate_file]
+    )
+
+    class Meta:
+        verbose_name = 'Файлы книги'
+        verbose_name_plural = 'Файлы книг'
+        unique_together = [["book", "name"]]
 
 
 class Book(models.Model):
@@ -83,39 +116,6 @@ class Book(models.Model):
 
     def __str__(self):
         return self.name
-
-
-class BookFiles(models.Model):
-    book = models.ForeignKey(
-        Book,
-        on_delete=models.CASCADE,
-        related_name='files',
-        verbose_name='Книга',
-    )
-    PDF = models.FileField(
-        upload_to=val.book_directory_path,
-        validators=[val.validate_file_pdf]
-    )
-    FB2 = models.FileField(
-        upload_to=val.book_directory_path,
-        validators=[val.validate_file_fb2]
-    )
-    EPUB = models.FileField(
-        upload_to=val.book_directory_path,
-        validators=[val.validate_file_epub]
-    )
-    IEPUB = models.FileField(
-        upload_to=val.book_directory_path,
-        validators=[val.validate_file_epub]
-    )
-    MOBI = models.FileField(
-        upload_to=val.book_directory_path,
-        validators=[val.validate_file_mobi]
-    )
-
-    class Meta:
-        verbose_name = 'Файлы книги'
-        verbose_name_plural = 'Файлы книг'
 
 
 class BookImage(models.Model):

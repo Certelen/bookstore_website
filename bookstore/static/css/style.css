@@ -20,6 +20,7 @@ a {
     font-family: 'jost', sans-serif !important;
     font-weight: 400 !important;
     color: black !important;
+    text-decoration-skip-ink: none;
 }
 
 main {

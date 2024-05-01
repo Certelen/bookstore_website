@@ -5,10 +5,11 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from datetime import timedelta, date
+from itertools import chain
 
 from .models import Book, Genre, Banner
 from .forms import SearchForm
-from users.models import Review
+from users.models import Review, ViewedGenres
 from users.forms import SignupForm
 from bookstore.settings import NEWBOOK_DAYS, MAX_BOOKS_ON_SLIDER
 
@@ -56,7 +57,9 @@ def index(request):
         new = Book.objects.order_by('created')
     if user.is_authenticated:
         if user.viewed_genres:
-            recomended = popular.filter(genre=user.most_viewed_genres)
+            user_recomended = popular.filter(genre=user.most_viewed_genres)
+            recomended = list(chain(user_recomended,
+                              recomended.difference(user_recomended)))
         favorite_books = user.favorite_books.all().values_list('id', flat=True)
 
     context = {
@@ -201,19 +204,23 @@ def book_detail(request, book_id, book_status=0, book_favorite=0):
     book = get_object_or_404(Book, id=book_id)
     images = [book.main_image]
     images += [obj.image for obj in book.images.all()]
+    files_format = book.files.all().values_list('name', flat=True)
     if request.user.is_authenticated:
         order = user.order.filter(close=False)[0]
         book_status = 2 if user.buyed_books.filter(id=book_id) else 0
         if not book_status:
             book_status = 1 if order.book.filter(id=book_id) else 0
         book_favorite = 1 if user.favorite_books.filter(id=book_id) else 0
+        for genre in book.genre.all():
+            ViewedGenres.objects.create(user=user, genre=genre)
     reviews = Review.objects.filter(book=book)
     context = {
         'book': book,
         'images': images,
         'book_status': book_status,
         'reviews': reviews,
-        'book_favorite': book_favorite
+        'book_favorite': book_favorite,
+        'files_format': files_format
     }
     context.update(forms)
     return TemplateResponse(request, 'books/book_detail.html', context)

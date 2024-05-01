@@ -44,6 +44,12 @@ def login(request):
 
 
 @login_required
+def logout(request):
+    auth.logout(request)
+    return redirect('books:index')
+
+
+@login_required
 def favorite(request, sort='buying'):
     user = request.user
     books_list = user.favorite_books.all()
