@@ -1,8 +1,5 @@
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
-from django.core.exceptions import ValidationError
-from django.dispatch import receiver
-from django.db.models.signals import pre_delete, pre_save
 
 import books.validator as val
 
