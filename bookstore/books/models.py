@@ -1,6 +1,8 @@
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 
+import books.validator as val
+
 
 class Genre(models.Model):
     name = models.CharField(
@@ -29,8 +31,13 @@ class Book(models.Model):
         max_length=200,
     )
     description = models.TextField(
-        'Описание книги',
-        help_text='Характеристики товара',
+        'Описание книги'
+    )
+    fragment = models.TextField(
+        'Ознакомительный отрывок книги'
+    )
+    pages = models.PositiveIntegerField(
+        'Количество страниц'
     )
     genre = models.ManyToManyField(
         Genre,
@@ -60,8 +67,11 @@ class Book(models.Model):
             MinValueValidator(0)
         ]
     )
+    release = models.DateField(
+        'Дата выпуска книги'
+    )
     created = models.DateField(
-        'Дата добавления книги',
+        'Дата добавления книги на сайт',
         auto_now_add=True,
         db_index=True,
     )
@@ -73,6 +83,39 @@ class Book(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class BookFiles(models.Model):
+    book = models.ForeignKey(
+        Book,
+        on_delete=models.CASCADE,
+        related_name='files',
+        verbose_name='Книга',
+    )
+    PDF = models.FileField(
+        upload_to=val.book_directory_path,
+        validators=[val.validate_file_pdf]
+    )
+    FB2 = models.FileField(
+        upload_to=val.book_directory_path,
+        validators=[val.validate_file_fb2]
+    )
+    EPUB = models.FileField(
+        upload_to=val.book_directory_path,
+        validators=[val.validate_file_epub]
+    )
+    IEPUB = models.FileField(
+        upload_to=val.book_directory_path,
+        validators=[val.validate_file_epub]
+    )
+    MOBI = models.FileField(
+        upload_to=val.book_directory_path,
+        validators=[val.validate_file_mobi]
+    )
+
+    class Meta:
+        verbose_name = 'Файлы книги'
+        verbose_name_plural = 'Файлы книг'
 
 
 class BookImage(models.Model):

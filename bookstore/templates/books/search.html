@@ -107,11 +107,11 @@
                 <div class="row">
                     {% for book in page_obj %}
                     <div class="col-6 col-lg-3 mb-3">
-                        <div class="card">
+                        <a class="card" href="{% url 'books:book' book.id %}">
                             {% include 'dynamic_forms/favorite.html' %}
                             <div class="carousel-img">
                                 {% thumbnail book.main_image "221x240" crop="center" upscale=True as book_main_image %}
-                                <img src="{{ book_main_image }}" class="card-img-top" alt="...">
+                                <img src="{{ book_main_image.url }}" class="card-img-top" alt="...">
                                 {% endthumbnail %}
                             </div>
                             <div class="card-body pt-1 pe-1 ps-1 pb-0 justify-content-between d-flex flex-column">
@@ -127,7 +127,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </a>
                     </div>
                     {% endfor %}
                 </div>

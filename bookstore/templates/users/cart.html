@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% load thumbnail %}
+{% load static %}
+{% block content %}
+<script>
+    // При нажатии кнопки "Удалить книгу из корзины" товар удаляется из html страницы и из заказа в БД
+    $(document).ready(function () {
+        $(".delete-book").submit(function () {
+            var elem = $(this)
+            console.log(Number(document.getElementById("price").textContent))
+            $.ajax({
+                type: 'POST',
+                url: $(this).attr('action'),
+                data: $(this).serialize(),
+                success: function (html) {
+                    var price = Number(document.getElementById("price").textContent);
+                    price -= parseInt(elem.find("span[class='book_price']").text())
+                    document.getElementById("price").textContent = price
+                    elem.remove();
+                }
+            });
+            return false;
+        });
+    });
+</script>
+<script>
+    // При нажатии кнопки "Удалить книгу из корзины" товар удаляется из html страницы и из заказа в БД
+    $(document).ready(function () {
+        if (Number('{{ buy }}') > 0) {
+            $('#buy_modal_button').click()
+        }
+    });
+</script>
+{% if buy == 2 %}
+<div id="buy_modal" class="modal fade modal-fullscreen" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body d-flex flex-column align-items-end">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="d-flex flex-column align-items-center mb-5">
+                <span style="font-size: 24px; font-weight: 600;">Поздравляем с покупкой!</span>
+                <div class="d-flex">
+                    <span>Перейдите в</span>
+                    <a href="{% url 'users:library' %}" class="mx-1">библиотеку</a>
+                    <span>для чтения.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% elif buy == 1 %}
+<div id="buy_modal" class="modal fade modal-fullscreen" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body d-flex flex-column align-items-end">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="d-flex flex-column align-items-center mb-5">
+                <span style="font-size: 24px; font-weight: 600;">Что-то пошло не так.</span>
+                <span> Попробуйте оформить заказ еще раз.</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'books:index' %}">Главная</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Корзина</li>
+    </ol>
+</nav>
+<div class="row">
+    <div class="col-12" style="min-height: 800px; height: unset;">
+        <div class="row">
+            <div class="col-12 col-lg-3 mb-5">
+                <button id="buy_modal_button" type="button" class="btn btn-primary" data-bs-toggle="modal"
+                    data-bs-target="#buy_modal" hidden>
+                    Launch demo modal
+                </button>
+                <form id="cart-close" class="background-after" method="post" action="{% url 'users:payment' %}">
+                    {% csrf_token %}
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span style="font-size: 16px; font-weight: 600;">Итого:</span>
+                        <div>
+                            <span id="price" style="font-size: 20px; font-weight: 400;">{{ price }}</span>
+                            <span> ₽</span>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-light mt-2 text-light w-100"
+                        style="background-color: #123C69;">Оформить заказ</button>
+                </form>
+            </div>
+            <div class="col-12 col-lg-9 p-3 background-after">
+                {% for book in books_order %}
+                <form class="row delete-book d-flex rounded-3 mt-3 mx-0"
+                    style="border: 2px #123C69 solid; overflow: hidden;" method="post"
+                    action="{% url 'books:change_cart' %}">
+                    {% csrf_token %}
+                    <div class="col-12 col-lg-9 d-flex px-0 " style="background-color: #EEE2DC; height: min-content;">
+                        <div class="d-flex justify-content-center mx-4">
+                            <a class="rounded-2"
+                                style="width: min-content; height: min-content; border: 2px #AC3B61 solid; overflow: hidden; display: flex;"
+                                href="{% url 'books:book' book.id %}">
+                                <img height="100px" src="{{ book.main_image.url }}">
+                            </a>
+                        </div>
+                        <div class="d-flex justify-content-center align-items-center">
+                            <a href="{% url 'books:book' book.id %}">
+                                {{ book.name }}
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-3 d-flex flex-column px-0s justify-content-between">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span style="font-size: 16px; font-weight: 600;">Цена:</span>
+                            <span class="book_price" style="font-size: 20px; font-weight: 400;">{{ book.price }}
+                                ₽</span>
+                        </div>
+                        <button class="btn btn-light w-100 mb-3 text-light" style="background-color: #AC3B61;"
+                            type="submit">
+                            <span>Удалить из корзины</span>
+                        </button>
+                        <input name="book" value="{{ book.id }}" hidden>
+                    </div>
+                </form>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

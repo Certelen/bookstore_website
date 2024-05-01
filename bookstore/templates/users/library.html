@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load thumbnail %}
+{% load static %}
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'books:index' %}">Главная</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Библиотека</li>
+    </ol>
+</nav>
+<div class="row">
+    <div class="col-12" style="min-height: 800px; height: unset;">
+        <div class="row">
+            <div class="col-12 p-3 background-after">
+                {% for book in buyed_books %}
+                <div class="row delete-book d-flex rounded-3 mt-3 mx-0"
+                    style="border: 2px #123C69 solid; overflow: hidden;">
+                    <div class="col-10 d-flex px-0 " style="background-color: #EEE2DC; height: min-content;">
+                        <div class="d-flex justify-content-center mx-4">
+                            <a class="rounded-2"
+                                style="width: min-content; height: min-content; border: 2px #AC3B61 solid; overflow: hidden; display: flex;"
+                                href="{% url 'books:book' book.id %}">
+                                <img height="100px" src="{{ book.main_image.url }}">
+                            </a>
+                        </div>
+                        <div class="d-flex justify-content-center align-items-center">
+                            <a href="{% url 'books:book' book.id %}">
+                                {{ book.name }}
+                            </a>
+                        </div>
+                    </div>
+                    <div
+                        class="row col-2 d-flex flex-column px-0s justify-content-between align-items-center text-center mb-1">
+                        <span style="font-size: 16px; font-weight: 600;">Скачивание:</span>
+                        <div class="d-flex col-lg-12 justify-content-between">
+                            <a class="btn p-1" style="background-color: #123C69;"
+                                href="{% url 'users:get_book' book.id 'PDF' %}">
+                                <span style="color: #FFF;">PDF</span>
+                            </a>
+                            <a class="btn p-1" style="background-color: #123C69;"
+                                href="{% url 'users:get_book' book.id 'FB2' %}">
+                                <span style="color: #FFF;">FB2</span>
+                            </a>
+                            <a class="btn p-1" style="background-color: #123C69;"
+                                href="{% url 'users:get_book' book.id 'EPUB' %}">
+                                <span style="color: #FFF;">EPUB</span>
+                            </a>
+                        </div>
+                        <div class="d-flex col-lg-12 justify-content-between">
+                            <a class="btn p-1" style="background-color: #123C69;"
+                                href="{% url 'users:get_book' book.id 'IEPUB' %}">
+                                <span style="color: #FFF;">IOS.EPUB</span>
+                            </a>
+                            <a class="btn p-1" style="background-color: #123C69;"
+                                href="{% url 'users:get_book' book.id 'MOBI' %}">
+                                <span style="color: #FFF;">MOBI</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -196,7 +196,7 @@ def news(request, sort='min_created'):
     return TemplateResponse(request, 'books/news.html', context)
 
 
-def book_detail(request, book_id, book_status=0):
+def book_detail(request, book_id, book_status=0, book_favorite=0):
     user = request.user
     book = get_object_or_404(Book, id=book_id)
     images = [book.main_image]
@@ -206,19 +206,21 @@ def book_detail(request, book_id, book_status=0):
         book_status = 2 if user.buyed_books.filter(id=book_id) else 0
         if not book_status:
             book_status = 1 if order.book.filter(id=book_id) else 0
+        book_favorite = 1 if user.favorite_books.filter(id=book_id) else 0
     reviews = Review.objects.filter(book=book)
     context = {
         'book': book,
         'images': images,
         'book_status': book_status,
-        'reviews': reviews
+        'reviews': reviews,
+        'book_favorite': book_favorite
     }
     context.update(forms)
     return TemplateResponse(request, 'books/book_detail.html', context)
 
 
 @login_required
-def change_favorite(request):
+def change_favorite(request, book_favorite=0):
     if request.method == "POST":
         user = request.user
         book = Book.objects.get(id=request.POST['book'])
@@ -228,11 +230,15 @@ def change_favorite(request):
             user.favorite_books.remove(book)
         else:
             user.favorite_books.add(book)
-        favorite_books = favorite_books.values_list(flat=True)
+            book_favorite = 1
         context = {
             'book': book,
-            'favorite_books': favorite_books
+            'book_favorite': book_favorite,
         }
+        if 'button' in request.POST:
+            return TemplateResponse(
+                request, 'dynamic_forms/favorite_button.html', context
+            )
         return TemplateResponse(
             request, 'dynamic_forms/favorite.html', context
         )
@@ -251,7 +257,7 @@ def change_cart(request, book_status=0):
                 'book_status': 2
             }
             return TemplateResponse(
-                request, 'dynamic_forms/cart.html', context
+                request, 'dynamic_forms/cart_button.html', context
             )
         order = user.order.filter(close=False)[0]
         book_order = order.book.filter(id=data['book'])
@@ -264,5 +270,7 @@ def change_cart(request, book_status=0):
             'book': book,
             'book_status': book_status
         }
-        return TemplateResponse(request, 'dynamic_forms/cart.html', context)
-    return reverse_lazy('products:index')
+        return TemplateResponse(
+            request, 'dynamic_forms/cart_button.html', context
+        )
+    return reverse_lazy('books:index')

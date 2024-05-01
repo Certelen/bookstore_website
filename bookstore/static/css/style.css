@@ -52,6 +52,7 @@ main {
     border-radius: 10px !important;
 }
 
+#form-profile input,
 .modal-content input {
     background-color: #123C69;
     color: white;
@@ -82,6 +83,7 @@ main {
     outline: unset !important;
 }
 
+#form-profile input:focus,
 .modal-content input:focus,
 #filters input:focus {
     background-color: #AC3B61;
@@ -321,6 +323,7 @@ main {
     color: orange;
 }
 
+#form-profile input::placeholder,
 #filters input::placeholder {
     color: #FFFFFF;
 }

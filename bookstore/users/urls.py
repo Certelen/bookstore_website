@@ -18,4 +18,23 @@ urlpatterns = [
     path(
         'review/<int:book_id>/', views.review, name='review'
     ),
+    path(
+        'profile', views.profile, name='profile'
+    ),
+    path(
+        'cart', views.cart, name='cart'
+    ),
+    path(
+        'cart/<int:buy>/', views.cart, name='cart'
+    ),
+    path(
+        'payment', views.payment, name='payment'
+    ),
+    path(
+        'library', views.library, name='library'
+    ),
+    path(
+        'get_book/<int:book_id>/<str:format>', views.get_book, name='get_book'
+    ),
+
 ]

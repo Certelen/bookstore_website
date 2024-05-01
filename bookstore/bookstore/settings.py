@@ -1,5 +1,9 @@
 from pathlib import Path
+from yookassa import Configuration
 import os
+
+Configuration.account_id = '379623'
+Configuration.secret_key = 'test_hXUSxJCqslcLBae6VraWI9y0hQDUufnTs--vZymxXxg'
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-xwep(%5c*4g%f*35i%h+b5xi=-tnpzl225@22t0jj914xq&b!q'

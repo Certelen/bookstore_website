@@ -3,8 +3,8 @@
 <form id="cart_form" class="w-100" method="post" action="{% url 'books:change_cart'%}">
     {% csrf_token %}
     {% if book_status == 1 %}
-    <button class="w-100 btn shadow-none border-0" style="background-color: #AC3B61;">
-        <span style="color:white">В корзине</span>
+    <button class="w-100 btn shadow-none border-0" style="background-color: #BAB2B5;">
+        <span style="color:black">В корзине</span>
     </button>
     {% elif book_status == 2 %}
     <div class="w-100 btn shadow-none border-0">

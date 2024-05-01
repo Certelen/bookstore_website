@@ -1,6 +1,14 @@
 from django.contrib import admin
 
-from .models import Book, Genre, BookImage, Banner
+from .models import Book, Genre, BookImage, Banner, BookFiles
+
+
+class BookFilesInline(admin.TabularInline):
+    model = BookFiles
+    extra = 1
+    can_delete = False
+    min_num = 1
+    max_num = 1
 
 
 class BookImageInline(admin.TabularInline):
@@ -10,7 +18,7 @@ class BookImageInline(admin.TabularInline):
 
 @admin.register(Book)
 class BookAdmin(admin.ModelAdmin):
-    inlines = [BookImageInline]
+    inlines = [BookFilesInline, BookImageInline]
 
 
 @admin.register(Genre)

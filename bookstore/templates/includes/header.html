@@ -139,7 +139,8 @@
         <div class="collapse multi-collapse navbar-collapse col-lg-3 order-4" id="ProfileLinks">
             <div class="d-flex justify-content-around d-flex justify-content-between w-100">
                 <a id="library" class="nav-link d-flex text-reset flex-column align-items-center lg-me-3"
-                    data-bs-toggle="tooltip" data-bs-placement="bottom" title="Просмотр купленных книг" href="#">
+                    data-bs-toggle="tooltip" data-bs-placement="bottom" title="Просмотр купленных книг"
+                    href="{% url 'users:library'%}">
                     <img src="{% static 'icons/library.svg' %}" class="icon-img nav-icon" alt="library icon"></img>
                     <span class="d-sm-inline text-white">Библиотека</span>
                 </a>
@@ -150,12 +151,13 @@
                     <span class="d-sm-inline text-white">Избранное</span>
                 </a>
                 <a id="cart" class="nav-link d-flex text-reset flex-column align-items-center lg-me-3"
-                    data-bs-toggle="tooltip" data-bs-placement="bottom" title="Перейти в корзину" href="#">
+                    data-bs-toggle="tooltip" data-bs-placement="bottom" title="Перейти в корзину"
+                    href="{% url 'users:cart' %}">
                     <img src="{% static 'icons/cart.svg' %}" class="icon-img nav-icon" alt="cart icon"></img>
                     <span class="d-sm-inline text-white">Корзина</span>
                 </a>
                 <a class="nav-link d-flex text-reset flex-column align-items-center d-none d-lg-flex blank_space blank_space"
-                    {% if user.is_authenticated %} href="{% url 'books:index'%}" title="Профиль" {% else %}
+                    {% if user.is_authenticated %} href="{% url 'users:profile'%}" title="Профиль" {% else %}
                     data-bs-toggle="modal" data-bs-target="#Login" href="#Login" title="Войти или зарегистрироваться"
                     blank_space {% endif %}>
                     <img src="{% static 'icons/profile.svg' %}" class="icon-img nav-icon" alt="profile icon"></img>

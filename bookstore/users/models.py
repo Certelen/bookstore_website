@@ -149,6 +149,12 @@ class Order(models.Model):
         verbose_name='Книги',
         blank=True
     )
+    payment = models.CharField(
+        'id платежа',
+        max_length=200,
+        blank=True,
+        null=True
+    )
     close = models.BooleanField(
         'Возможность изменять заказ',
         help_text='Возможность изменять заказ',

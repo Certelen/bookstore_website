@@ -3,8 +3,7 @@
     {% csrf_token %}
     <input value="{{ book.id }}" name="book" hidden>
     <button class="favorite-button">
-        {% if book.id in favorite_books %}
-
+        {% if book.id in favorite_books or book_favorite == 1 %}
         <img src="{% static '/icons/del_favorite.svg' %}">
         {% else %}
         <img src="{% static '/icons/add_favorite.svg' %}">
