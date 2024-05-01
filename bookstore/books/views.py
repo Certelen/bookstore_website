@@ -10,8 +10,7 @@ from .models import Book, Genre, Banner
 from .forms import SearchForm
 from users.models import Review
 from users.forms import SignupForm
-# from bookstore.settings import (MAX_ROW_ON_PAGE,
-# NEWBOOK_DAYS, MAX_BOOKS_ON_SLIDER)
+from bookstore.settings import NEWBOOK_DAYS, MAX_BOOKS_ON_SLIDER
 
 
 # Формы ниже используется на всех страницах
@@ -49,7 +48,8 @@ def filter_books(books_list, data, sort):
 def index(request):
     user = request.user
     popular = Book.objects.all().order_by('-buying')
-    new = Book.objects.filter(created__gte=date.today() - timedelta(days=7))
+    new = Book.objects.filter(
+        created__gte=date.today() - timedelta(days=NEWBOOK_DAYS))
     recomended = Book.objects.all().order_by('-score')
     favorite_books = None
     if not new:
@@ -60,9 +60,9 @@ def index(request):
         favorite_books = user.favorite_books.all().values_list('id', flat=True)
 
     context = {
-        'popular': popular[:15],
-        'new': new[:15],
-        'recomended': recomended[:15],
+        'popular': popular[:MAX_BOOKS_ON_SLIDER],
+        'new': new[:MAX_BOOKS_ON_SLIDER],
+        'recomended': recomended[:MAX_BOOKS_ON_SLIDER],
         'banners': Banner.objects.all(),
         'favorite_books': favorite_books
     }
@@ -99,7 +99,7 @@ def search(request, sort='buying'):
                 'datemax': data['datemax'],
             }
             filter_dict.update(post_filter_dict)
-        if sort:
+        if sort and books_list:
             books_list = books_list.order_by(
                 '-' + sort[4:] if 'min_' in sort else sort
             )
@@ -160,7 +160,7 @@ def catalog(request, sort='buying'):
 def news(request, sort='min_created'):
     user = request.user
     books_list = Book.objects.filter(
-        created__gte=date.today() - timedelta(days=7))
+        created__gte=date.today() - timedelta(days=NEWBOOK_DAYS))
     favorite_books = None
     filter_dict = {
         'sort': sort

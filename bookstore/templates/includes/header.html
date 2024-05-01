@@ -102,9 +102,9 @@
             href="{% url 'books:index'%}">Bookstore
         </a>
         <a class="nav-link d-flex text-reset flex-column align-items-center pb-1 col-2 offset-2 d-lg-none order-2 blank_space"
-            {% if user.is_authenticated %} href="{% url 'books:index'%}" title="Профиль" {% else %}
-            data-bs-toggle="modal" data-bs-target="#Login" href="#Login" title="Войти или зарегистрироваться"
-            blank_space {% endif %}>
+            {% if user.is_authenticated %} href="{% url 'users:profile'%}" title="Профиль" {% else %}
+            data-bs-toggle="modal" data-bs-target="#Login" href="{% url 'users:profile'%}"
+            title="Войти или зарегистрироваться" blank_space {% endif %}>
             <img src="{% static 'icons/profile.svg' %}" class="icon-img nav-icon" alt="profile icon"></img>
         </a>
         <div class="collapse multi-collapse navbar-collapse show order-2 col-lg-6" id="BooksLinks">

@@ -1,4 +1,3 @@
-import os
 import django.contrib.auth as auth
 from django.template.response import TemplateResponse
 from django.contrib.auth.decorators import login_required
@@ -7,11 +6,10 @@ from django.urls import reverse_lazy
 from django.http import JsonResponse
 from http import HTTPStatus
 from django.contrib.auth.forms import AuthenticationForm
-from django.http import HttpResponseRedirect, Http404, HttpResponse
+from django.http import HttpResponseRedirect
 import uuid
 from yookassa import Payment
 
-from bookstore import settings
 from books.models import Genre, Book
 from books.views import filter_books, forms
 from .forms import SignupForm, ChangeForm

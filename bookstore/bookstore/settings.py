@@ -1,12 +1,17 @@
 from pathlib import Path
 from yookassa import Configuration
+from dotenv import load_dotenv
 import os
 
-Configuration.account_id = '379623'
-Configuration.secret_key = 'test_hXUSxJCqslcLBae6VraWI9y0hQDUufnTs--vZymxXxg'
+load_dotenv()
+
+Configuration.account_id = os.getenv('YU_KASSA_ID')
+Configuration.secret_key = os.getenv('YU_KASSA_KEY')
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-SECRET_KEY = 'django-insecure-xwep(%5c*4g%f*35i%h+b5xi=-tnpzl225@22t0jj914xq&b!q'
+SECRET_KEY = (
+    'django-insecure-xwep(%5c*4g%f*35i%h+b5xi=-tnpzl225@22t0jj914xq&b!q'
+)
 DEBUG = True
 ALLOWED_HOSTS = ['*']
 
@@ -60,8 +65,12 @@ WSGI_APPLICATION = 'bookstore.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DATABASE_NAME', default='postgres'),
+        'USER': os.getenv('DATABASE_USERNAME', default='postgres'),
+        'PASSWORD': os.getenv('DATABASE_PASSWORD', default='postgres'),
+        'HOST': os.getenv('DATABASE_HOST', default='localhost'),
+        'PORT': os.getenv('DATABASE_PORT', default='5432'),
     }
 }
 
@@ -95,3 +104,8 @@ MEDIA_ROOT = os.path.join(STATICFILES_DIRS[0], 'media')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_URL = 'books:index'
+
+
+# Переменные-цифры
+NEWBOOK_DAYS = 7
+MAX_BOOKS_ON_SLIDER = 12

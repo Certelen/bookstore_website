@@ -7,10 +7,11 @@ Django==5.0.4
 idna==3.7
 netaddr==1.2.1
 pillow==10.3.0
+psycopg2==2.9.9
+python-dotenv==1.0.1
 requests==2.31.0
 sorl-thumbnail==12.10.0
 sqlparse==0.5.0
-thumbnail==1.5
 tzdata==2024.1
 urllib3==2.2.1
 wrapt==1.16.0
