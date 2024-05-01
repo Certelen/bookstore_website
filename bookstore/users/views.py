@@ -151,6 +151,8 @@ def payment(request):
                 user.buyed_books.add(book)
             order.close = True
             Order.objects.create(user=user)
+            book.buying += 1
+            book.save()
             buy = 2
         else:
             order.payment = ''
