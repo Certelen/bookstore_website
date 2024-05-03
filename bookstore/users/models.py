@@ -85,15 +85,11 @@ class CustomUser(AbstractUser):
             )
             user.viewed_genres += 1
             if user.viewed_genres >= 20:
-                iteration = 0
                 while user.viewed_genres != 20:
-                    print(iteration)
                     user.viewed_genres -= 1
                     early_genre = ViewedGenres.objects.filter(
-                        user=user)[iteration]
-                    print(early_genre)
+                        user=user).order_by('id')[0]
                     early_genre.delete()
-                    iteration += 1
             user.save()
 
 

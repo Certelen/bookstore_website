@@ -1,5 +1,6 @@
 import django.contrib.auth as auth
 from django.template.response import TemplateResponse
+from django.db.models import F
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
@@ -10,13 +11,14 @@ from django.http import HttpResponseRedirect
 import uuid
 from yookassa import Payment
 
-from books.models import Genre, Book
-from books.views import filter_books, forms
+from books.models import Book
+from books.views import catalog_type, forms
 from .forms import SignupForm, ChangeForm
 from .models import Review, Order
 
 
 def signup(request):
+    """Регистрация"""
     if request.method == "POST":
         form = SignupForm(request.POST, auto_id='signup_%s')
         if form.is_valid():
@@ -31,6 +33,7 @@ def signup(request):
 
 
 def login(request):
+    """Вход в аккаунт"""
     if request.method == "POST":
         form = AuthenticationForm(data=request.POST)
         if form.is_valid():
@@ -45,49 +48,22 @@ def login(request):
 
 @login_required
 def logout(request):
+    """Выход из аккаунта"""
     auth.logout(request)
     return redirect('books:index')
 
 
 @login_required
 def favorite(request, sort='buying'):
-    user = request.user
-    books_list = user.favorite_books.all()
-    filter_dict = {
-        'sort': sort
-    }
-    if request.method == "POST":
-        data = request.POST
-        sort = data['sort']
-        books_list = filter_books(books_list, data, sort)
-        post_filter_dict = {
-            'genres': list(map(int, data.getlist('genres'))),
-            'pricemin': data['pricemin'],
-            'pricemax': data['pricemax'],
-            'datemin': data['datemin'],
-            'datemax': data['datemax'],
-        }
-        filter_dict.update(post_filter_dict)
-
-    favorite_books = books_list.values_list('id', flat=True)
-
-    genres = Genre.objects.all()
-    books_list = books_list.order_by(
-        '-' + sort[4:] if 'min_' in sort else sort
-    )
-    context = {
-        'page_obj': books_list,
-        'genres': genres,
-        sort: 'active',
-        'filter_dict': filter_dict,
-        'favorite_books': favorite_books
-    }
-    context.update(forms)
+    """Каталог избранного"""
+    books_list = request.user.favorite_books.all()
+    context = catalog_type(request, books_list, sort, True, True)
     return TemplateResponse(request, 'users/favorite.html', context)
 
 
 @login_required
-def review(request, book_id):
+def create_review(request, book_id):
+    """Создание нового отзыва"""
     book = get_object_or_404(Book, id=book_id)
     if request.method == 'POST':
         data = request.POST
@@ -100,15 +76,41 @@ def review(request, book_id):
             comment=data['text'],
             score=score
         )
-        score_list = [review.score for review in book.review.all()]
-        book.score = sum(score_list) / len(score_list)
-        book.save()
+        if book.review.all():
+            score_list = [review.score for review in book.review.all()]
+            book.score = sum(score_list) / len(score_list)
+            book.save()
         return JsonResponse(status=HTTPStatus.OK, data={})
     return reverse_lazy('books:index')
 
 
 @login_required
+def change_review(request, book_id, review_id):
+    """Изменение или удаление отзыва"""
+    book = get_object_or_404(Book, id=book_id)
+    review = Review.objects.filter(id=review_id)
+    if request.method == 'POST' and review:
+        data = request.POST
+        if 'delete' in data:
+            review.delete()
+        else:
+            score = int(data['score'])
+            if 0 >= score > 5:
+                score = 5
+            review.update(
+                comment=data['text'],
+                score=score
+            )
+        if book.review.all():
+            score_list = [review.score for review in book.review.all()]
+            book.score = sum(score_list) / len(score_list)
+            book.save()
+    return redirect('books:book', book_id=book_id)
+
+
+@login_required
 def profile(request):
+    """Профиль"""
     user = request.user
     change_form = ChangeForm(instance=user)
     if request.method == 'POST':
@@ -128,10 +130,15 @@ def profile(request):
 
 @login_required
 def cart(request, buy=0):
-    user = request.user
-    order = user.order.filter(close=False)[0]
-    books_order = order.book.all()
-    price = sum(books_order.values_list('price', flat=True))
+    """Корзина.
+    buy влияет на вывод модального окна после оплаты:
+    0 - пользователь не перенаправлен с оплаты,
+    1 - пользователь вернулся с оплаты не оплатив,
+    2 - пользователь вернулся с оплаты оплатив"""
+    books_order = request.user.order.get(close=False).book.all()
+    price = sum(books_order.annotate(
+        total_price=(F('price') * (100 - F('discount'))) / 100
+    ).values_list('total_price', flat=True))
     context = {
         'books_order': books_order,
         'price': price,
@@ -143,6 +150,9 @@ def cart(request, buy=0):
 
 @login_required
 def payment(request):
+    """Процесс оплаты и проверка что оплата успешна.
+    id платежа встраивается в order.
+    Если оплата неуспешна, id удаляется и создается новая оплата"""
     user = request.user
     order = user.order.filter(close=False)[0]
     if order.payment:
@@ -160,7 +170,9 @@ def payment(request):
         order.save()
         return redirect('users:cart', buy=buy)
 
-    price = sum(order.book.all().values_list('price', flat=True))
+    price = sum(order.book.annotate(
+        total_price=(F('price') * (100 - F('discount'))) / 100
+    ).values_list('total_price', flat=True))
     payment = Payment.create({
         "amount": {
             "value": f"{float(price)}",
@@ -179,10 +191,9 @@ def payment(request):
 
 @login_required
 def library(request):
-    user = request.user
-    buyed_books = user.buyed_books.all()
+    """Купленные книги пользователя (библиотека)"""
     context = {
-        'buyed_books': buyed_books
+        'buyed_books': request.user.buyed_books.all()
     }
     context.update(forms)
     return TemplateResponse(request, 'users/library.html', context)
@@ -190,6 +201,7 @@ def library(request):
 
 @login_required
 def get_book(request, book_id, format):
-    user = request.user
-    book = get_object_or_404(user.buyed_books, id=book_id)
-    return redirect('../../../' + eval('book.files.all()[0].'+format+'.name'))
+    """Возвращаем ссылку на запрашиваемый формат файла"""
+    book = get_object_or_404(request.user.buyed_books, id=book_id)
+    raise ValueError(book.files.all())
+    return redirect('../../../' + book.files.all().get(name=format))

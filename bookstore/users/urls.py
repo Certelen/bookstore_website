@@ -19,7 +19,10 @@ urlpatterns = [
         'favorite', views.favorite, name='favorite'
     ),
     path(
-        'review/<int:book_id>/', views.review, name='review'
+        'review/<int:book_id>/', views.create_review, name='review'
+    ),
+    path(
+        'review/<int:book_id>/<int:review_id>/', views.change_review, name='change_review'
     ),
     path(
         'profile', views.profile, name='profile'

@@ -1,0 +1,23 @@
+{% load static %}
+{% load thumbnail %}
+<a class="card" href="{% url 'books:book' book.id %}">
+    {% include 'dynamic_forms/favorite.html' %}
+    <div class="carousel-img">
+        {% thumbnail book.main_image "221x240" crop="center" upscale=True as book_main_image %}
+        <img src="{{ book_main_image.url }}" class="card-img-top" alt="...">
+        {% endthumbnail %}
+    </div>
+    <div class="card-body pt-1 pe-1 ps-1 pb-0 justify-content-between d-flex flex-column">
+        <span class="card-title mb-0 text-center"><b>{{ book.name }}</b></span>
+        <span class="card-text text-center">{{ book.author }}</span>
+        <div class="d-flex justify-content-between w-100">
+            <div class="d-flex">
+                <span class="ms-1" style="color:#FFFFFF">{{ book.get_price }} ₽</span>
+            </div>
+            <div class="d-flex">
+                <span class="rating-result">★</span>
+                <span class="rating-num">{{ book.score }}</span>
+            </div>
+        </div>
+    </div>
+</a>

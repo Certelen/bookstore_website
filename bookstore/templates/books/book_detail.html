@@ -72,17 +72,6 @@
                     <div id="main_image" class="mb-1 book_images d-flex align-items-center justify-content-center">
                         <img style="width: 100%;" src="{{ book.main_image.url }}" />
                     </div>
-                    <div class="mb-3 px-5 book_other_images">
-                        <div id="other_images" data-bs-ride="carousel"
-                            class="carousel slide  d-flex flex-column justify-content-between align-items-center">
-                            {% for image in images %}
-                            <div class="book_images_image d-flex justify-content-center" style="max-height: 70.63px;">
-                                <img style="max-width: 50px; max-height: 50px;" name="{{forloop.counter0}}"
-                                    src="{{ image.url }}" />
-                            </div>
-                            {% endfor %}
-                        </div>
-                    </div>
                     <div class="w-100 book_other_images d-flex justify-content-around"
                         style="font-weight: 600; font-size: 20px;">
                         <div class="d-flex flex-column align-items-center">
@@ -148,20 +137,21 @@
                         action="{% url 'users:review' book.id %}">
                         {% csrf_token %}
                         <h4>Оставить отзыв:</h4>
-                        <div class="rating-area mb-0" style="width: max-content;">
-                            <input type="radio" id="star-5" name="score" checked="checked" value="5">
+                        <div id="comment-form-score" class="rating-area mb-0" style="width: max-content;">
+                            <input class="star-rating" type="radio" id="star-5" name="score" checked="checked"
+                                value="5">
                             <label for="star-5" title="Оценка «5»"></label>
-                            <input type="radio" id="star-4" name="score" value="4">
+                            <input class="star-rating" type="radio" id="star-4" name="score" value="4">
                             <label for="star-4" title="Оценка «4»"></label>
-                            <input type="radio" id="star-3" name="score" value="3">
+                            <input class="star-rating" type="radio" id="star-3" name="score" value="3">
                             <label for="star-3" title="Оценка «3»"></label>
-                            <input type="radio" id="star-2" name="score" value="2">
+                            <input class="star-rating" type="radio" id="star-2" name="score" value="2">
                             <label for="star-2" title="Оценка «2»"></label>
-                            <input type="radio" id="star-1" name="score" value="1">
+                            <input class="star-rating" type="radio" id="star-1" name="score" value="1">
                             <label for="star-1" title="Оценка «1»"></label>
                         </div>
-                        <div class="w-100">
-                            <textarea id="comment-area" class="w-100 rounded-3" name="text"></textarea>
+                        <div id="comment-form-text" class="w-100 comment-form-text">
+                            <textarea class="w-100 rounded-3" name="text"></textarea>
                         </div>
                         <button id="comment-button" type="submit" class="btn" style="background-color: #123C69;">
                             <span style="color: white;">
@@ -174,7 +164,9 @@
                 <div class="d-flex p-2 flex-column justify-content-center book_images">
                     <h1 class="m-0">Отзывы</h1>
                     {% for review in reviews %}
-                    <div class="rounded-3 d-flex flex-column p-3 mt-2" style="border: 2px #BAB2B5 solid">
+                    <form class="rounded-3 d-flex flex-column p-3 mt-2" style="border: 2px #BAB2B5 solid" method="post"
+                        action="{% url 'users:change_review' book.id review.id  %}">
+                        {% csrf_token %}
                         <div class="d-flex justify-content-between">
                             <h5>{{ review.user }}</h5>
                             <div class="rating-result m-0">
@@ -186,7 +178,24 @@
                             </div>
                         </div>
                         <span style="overflow-wrap: break-word;">{{ review.comment }}</span>
-                    </div>
+                        {% if user == review.user %}
+                        <div class="d-flex justify-content-between mt-3">
+                            <button type="button" class="btn comment-button-change" style="background-color: #123C69;">
+                                <span style="color: white;">
+                                    Изменить отзыв
+                                </span>
+                            </button>
+                            <button type="submit" class="btn comment-button-delete" name="delete"
+                                style="background-color: #AC3B61;">
+                                <span style="color: white;">
+                                    Удалить отзыв
+                                </span>
+                            </button>
+                        </div>
+                        <input class="review-score" value="{{ review.score }}" hidden>
+                        <input class="review-id" value="{{ review.id }}" hidden>
+                        {% endif %}
+                    </form>
                     {% empty %}
                     <span style="font-size: 18px;">Пока никто не оставил отзыва.</span>
                     {% endfor %}
@@ -195,7 +204,7 @@
 
             <div class="col-12 mb-3 col-lg-3 order-2 order-lg-3">
                 <div class="d-flex p-2 flex-column align-items-center justify-content-center book_images">
-                    <h1>{{ book.price }} ₽</h1>
+                    <h1>{{ book.get_price }} ₽</h1>
                     {% include 'dynamic_forms/cart_button.html' %}
                     {% include 'dynamic_forms/favorite_button.html' %}
                 </div>
@@ -203,34 +212,36 @@
         </div>
     </div>
 </div>
-<style>
-    .owl-nav {
-        width: 100%;
-        height: 100%;
-    }
-
-    .owl-nav button {
-        top: 0;
-        right: -46px;
-    }
-
-    .owl-nav .owl-prev {
-        right: unset;
-        left: -46px;
-    }
-
-    .owl-stage-outer {
-        width: 94% !important;
-    }
-</style>
 <script>
-    $(document).ready(function () {
-        $("#other_images").owlCarousel({
-            items: 4,
-            center: true,
-            margin: 10,
-            nav: true,
-            dots: false
+    // Изменение или удаление отзыва
+    $(function () {
+        $('.comment-button-change').click(function () {
+            form = $(this).parent().parent()
+            review_id = form.children('.review-id').val()
+            score_value = '#star-' + form.children('.review-score').val()
+
+            score_form = $('#comment-form-score').clone().removeAttr('id')
+            score_form.children('#star-5').removeAttr('checked')
+            score_form.children(score_value).attr('checked', 'checked')
+
+            all_input_score = score_form.find('input')
+            all_label_score = score_form.find('label')
+            for (let i = 0; i < 5; i++) {
+                id = all_input_score.eq(i).attr('id')
+                all_input_score.eq(i).attr('id', id + review_id)
+                all_label_score.eq(i).attr('for', id + review_id)
+            }
+
+            comment_form = $('#comment-form-text').clone().removeAttr('id')
+            button_form = $('#comment-button').clone().removeAttr('id')
+
+
+            comment_text = form.children('span').text()
+
+            form.children().children('.rating-result').replaceWith(score_form)
+            form.children('span').replaceWith(comment_form)
+            form.children('.comment-form-text').children('textarea').val(comment_text)
+            $(this).replaceWith(button_form)
         });
     });
 </script>

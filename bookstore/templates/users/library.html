@@ -15,7 +15,7 @@
                 {% for book in buyed_books %}
                 <div class="row delete-book d-flex rounded-3 mt-3 mx-0"
                     style="border: 2px #123C69 solid; overflow: hidden;">
-                    <div class="col-10 d-flex px-0 " style="background-color: #EEE2DC; height: min-content;">
+                    <div class="col-12 col-lg-8 d-flex px-0 align-items-center" style="background-color: #EEE2DC; ">
                         <div class="d-flex justify-content-center mx-4">
                             <a class="rounded-2"
                                 style="width: min-content; height: min-content; border: 2px #AC3B61 solid; overflow: hidden; display: flex;"
@@ -29,32 +29,17 @@
                             </a>
                         </div>
                     </div>
-                    <div
-                        class="row col-2 d-flex flex-column px-0s justify-content-between align-items-center text-center mb-1">
+                    <div class="row col-12 col-lg-4 d-flex flex-column px-0s align-items-center text-center mb-1">
                         <span style="font-size: 16px; font-weight: 600;">Скачивание:</span>
-                        <div class="d-flex col-lg-12 justify-content-between">
-                            <a class="btn p-1" style="background-color: #123C69;"
-                                href="{% url 'users:get_book' book.id 'PDF' %}">
-                                <span style="color: #FFF;">PDF</span>
-                            </a>
-                            <a class="btn p-1" style="background-color: #123C69;"
-                                href="{% url 'users:get_book' book.id 'FB2' %}">
-                                <span style="color: #FFF;">FB2</span>
-                            </a>
-                            <a class="btn p-1" style="background-color: #123C69;"
-                                href="{% url 'users:get_book' book.id 'EPUB' %}">
-                                <span style="color: #FFF;">EPUB</span>
-                            </a>
-                        </div>
-                        <div class="d-flex col-lg-12 justify-content-between">
-                            <a class="btn p-1" style="background-color: #123C69;"
-                                href="{% url 'users:get_book' book.id 'IEPUB' %}">
-                                <span style="color: #FFF;">IOS.EPUB</span>
-                            </a>
-                            <a class="btn p-1" style="background-color: #123C69;"
-                                href="{% url 'users:get_book' book.id 'MOBI' %}">
-                                <span style="color: #FFF;">MOBI</span>
-                            </a>
+                        <div class="d-flex col-lg-12 justify-content-between row">
+                            {% for file in book.files.all %}
+                            <div class="col-4 mb-1">
+                                <a class="btn" style="background-color: #123C69; min-width: 100%;"
+                                    href="{% url 'users:get_book' book.id file.name %}">
+                                    <span style="color: #FFF;">{{ file.name }}</span>
+                                </a>
+                            </div>
+                            {% endfor %}
                         </div>
                     </div>
                 </div>
