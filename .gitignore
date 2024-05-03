@@ -5,8 +5,6 @@ tests
 media
 cache
 .vscode
-data
-management
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
