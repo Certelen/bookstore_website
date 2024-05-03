@@ -8,7 +8,7 @@ from .models import Book, Genre, Banner, BookFiles, Event
 
 class BookFilesInline(admin.TabularInline):
     model = BookFiles
-    extra = 1
+    extra = 0
     min_num = 1
 
 
