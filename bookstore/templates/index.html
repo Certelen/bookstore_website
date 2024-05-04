@@ -47,10 +47,21 @@
                             <div class="d-flex">
                                 <span class="ms-1" style="color:#FFFFFF">{{ book.get_price }} ₽</span>
                             </div>
+                            {% if book.discount > 0 %}
+                            <div class="d-flex">
+                                <span class="ms-1"
+                                    style="color:#FFFFFF60; text-decoration: line-through;">{{book.price}}
+                                    ₽</span>
+                            </div>
+                            <div class="d-flex">
+                                <span class="ms-1" style="color:#AC3B61; font-weight: 600;">–{{ book.discount }}%</span>
+                            </div>
+                            {% else %}
                             <div class="d-flex">
                                 <span class="rating-result">★</span>
                                 <span class="rating-num">{{ book.score }}</span>
                             </div>
+                            {% endif %}
                         </div>
                     </div>
                 </a>
@@ -79,10 +90,21 @@
                             <div class="d-flex">
                                 <span class="ms-1" style="color:#FFFFFF">{{ book.get_price }} ₽</span>
                             </div>
+                            {% if book.discount > 0 %}
+                            <div class="d-flex">
+                                <span class="ms-1"
+                                    style="color:#FFFFFF60; text-decoration: line-through;">{{book.price}}
+                                    ₽</span>
+                            </div>
+                            <div class="d-flex">
+                                <span class="ms-1" style="color:#AC3B61; font-weight: 600;">–{{ book.discount }}%</span>
+                            </div>
+                            {% else %}
                             <div class="d-flex">
                                 <span class="rating-result">★</span>
                                 <span class="rating-num">{{ book.score }}</span>
                             </div>
+                            {% endif %}
                         </div>
                     </div>
                 </a>
@@ -110,10 +132,21 @@
                             <div class="d-flex">
                                 <span class="ms-1" style="color:#FFFFFF">{{ book.get_price }} ₽</span>
                             </div>
+                            {% if book.discount > 0 %}
+                            <div class="d-flex">
+                                <span class="ms-1"
+                                    style="color:#FFFFFF60; text-decoration: line-through;">{{book.price}}
+                                    ₽</span>
+                            </div>
+                            <div class="d-flex">
+                                <span class="ms-1" style="color:#AC3B61; font-weight: 600;">–{{ book.discount }}%</span>
+                            </div>
+                            {% else %}
                             <div class="d-flex">
                                 <span class="rating-result">★</span>
                                 <span class="rating-num">{{ book.score }}</span>
                             </div>
+                            {% endif %}
                         </div>
                     </div>
                 </a>

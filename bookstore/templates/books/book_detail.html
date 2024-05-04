@@ -16,6 +16,21 @@
         });
         return false;
     });
+    $(document).on("submit", "#cart_form", function () {
+        var form = $('#get_cart_img')
+        setTimeout(
+            () => {
+                $.ajax({
+                    url: form.attr('action'),
+                    success: function (html) {
+                        form.replaceWith(html)
+                    }
+                });
+                return false;
+            },
+            1000
+        );
+    });
 </script>
 <script>
     // Отправка отзыва на сервер. При ошибке (Недостаточно символов) выдает уведомление. При успехе - перезагрузка страницы.
@@ -34,29 +49,6 @@
     });
 </script>
 {% endif %}
-<script>
-    // Переключение изображений при нажатии на их миниатюры.
-
-    $(document).ready(function () {
-        var now_img = 0
-        var imgs_list = document.getElementsByClassName('owl-item')
-        $(document).on('click', '.owl-nav button', function () {
-            console.log(1)
-            if ($(this).hasClass('disabled')) {
-                return
-            } else {
-                if ($(this).hasClass('owl-next')) {
-                    now_img += 1
-                } else { now_img -= 1 }
-                let thumbnailURL = imgs_list[now_img].children[0].children[0].src
-                console.log(thumbnailURL)
-                $('#main_image img').fadeOut(200, function () {
-                    $(this).attr('src', thumbnailURL);
-                }).fadeIn(200);
-            }
-        });
-    });
-</script>
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{% url 'books:index' %}">Главная</a></li>
@@ -205,6 +197,12 @@
             <div class="col-12 mb-3 col-lg-3 order-2 order-lg-3">
                 <div class="d-flex p-2 flex-column align-items-center justify-content-center book_images">
                     <h1>{{ book.get_price }} ₽</h1>
+                    <div class="d-flex w-100 justify-content-between">
+                        {% if book.discount > 0 %}
+                        <h3 style="text-decoration: line-through;">{{book.price}} ₽</h3>
+                        <h4 style="color: #AC3B61;">–{{ book.discount }}%</h4>
+                        {% endif %}
+                    </div>
                     {% include 'dynamic_forms/cart_button.html' %}
                     {% include 'dynamic_forms/favorite_button.html' %}
                 </div>

@@ -14,16 +14,22 @@ from users.forms import SignupForm
 from bookstore.settings import NEWBOOK_DAYS, MAX_BOOKS_ON_SLIDER
 
 
-"""Формы ниже используется на всех страницах"""
-search_form = SearchForm
-auth_form = AuthenticationForm
-signup_form = SignupForm(auto_id='signup_%s')
+def main_forms(request, order_full=False):
+    """Формы ниже используется на всех страницах"""
+    user = request.user
+    search_form = SearchForm
+    auth_form = AuthenticationForm
+    signup_form = SignupForm(auto_id='signup_%s')
+    if user.is_authenticated:
+        order_full = user.order.get(close=False).book.all().exists()
 
-forms = {
-    'search_form': search_form,
-    'auth_form': auth_form,
-    'signup_form': signup_form
-}
+    forms = {
+        'search_form': search_form,
+        'auth_form': auth_form,
+        'signup_form': signup_form,
+        'order_full': order_full
+    }
+    return forms
 
 
 def filter_books(books_list, data, sort):
@@ -97,7 +103,7 @@ def catalog_type(request, books_list, sort, auth=False, favorite=False):
         'filter_dict': filter_dict,
         'favorite_books': favorite_books
     }
-    context.update(forms)
+    context.update(main_forms(request))
     return context
 
 
@@ -127,7 +133,7 @@ def index(request):
         'banners': Banner.objects.all(),
         'favorite_books': favorite_books
     }
-    context.update(forms)
+    context.update(main_forms(request))
     return TemplateResponse(request, 'index.html', context)
 
 
@@ -136,7 +142,7 @@ def search(request, sort='buying'):
     search_form = SearchForm
     data = request.POST
     search_word = data.get('search_word', '')
-    books_list = []
+    books_list = Book.objects.all()
 
     if search_word:
         books_list = Book.objects.filter(
@@ -189,7 +195,7 @@ def book_detail(request, book_id, book_status=0, book_favorite=0):
         'book_favorite': book_favorite,
         'files_format': files_format
     }
-    context.update(forms)
+    context.update(main_forms(request))
     return TemplateResponse(request, 'books/book_detail.html', context)
 
 

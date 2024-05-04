@@ -30,6 +30,7 @@ class EventForm(forms.ModelForm):
 @admin.register(Book)
 class BookAdmin(admin.ModelAdmin):
     inlines = [BookFilesInline]
+    readonly_fields = ('id',)
 
 
 @admin.register(Event)

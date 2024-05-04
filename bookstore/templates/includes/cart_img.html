@@ -1,0 +1,5 @@
+{% load static %}
+<form id="get_cart_img" method="get" action="{% url 'users:take_cart_img' %}">
+    <img src="{% if order_full %}{% static 'icons/cart_full.svg' %}{% else %}{% static 'icons/cart.svg' %}{% endif %}"
+        class="icon-img nav-icon" alt="cart icon"></img>
+</form>

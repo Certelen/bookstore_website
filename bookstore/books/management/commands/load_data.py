@@ -11,12 +11,11 @@ class Command(BaseCommand):
     help = "Loads data from csv files in static/data"
 
     def handle(self, *args, **options):
-
+        image = 1
         for genre in DictReader(
             open('static/data/genres.csv', encoding="utf8")
         ):
             genre = Genre(
-                id=genre['id'],
                 name=genre['name']
             )
             genre.save()
@@ -25,18 +24,18 @@ class Command(BaseCommand):
             open('static/data/books.csv', encoding="utf8")
         ):
             new_book = Book(
-                id=book['id'],
                 name=book['name'],
                 author=book['author'],
                 pages=book['pages'],
                 description=book['description'],
                 main_image=ImageFile(
-                    open(f"static/data/img/{book['id']}.png", "rb")),
+                    open(f"static/data/img/{image}.png", "rb")),
                 price=book['price'],
                 score=book['score'],
                 release=datetime.datetime.strptime(
                     book['release'], "%d%m%Y").date()
             )
+            image += 1
             new_book.save()
             for genre in book['genre'].split(','):
                 if genre:
@@ -51,7 +50,6 @@ class Command(BaseCommand):
             except Exception:
                 break
             new_banner = Banner(
-                id=img_id,
                 image=image
             )
             new_banner.save()

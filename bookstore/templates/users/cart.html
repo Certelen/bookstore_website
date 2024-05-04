@@ -7,7 +7,6 @@
     $(document).ready(function () {
         $(".delete-book").submit(function () {
             var elem = $(this)
-            console.log(Number(document.getElementById("price").textContent))
             $.ajax({
                 type: 'POST',
                 url: $(this).attr('action'),
@@ -19,6 +18,21 @@
                     elem.remove();
                 }
             });
+            var form = $('#get_cart_img')
+            setTimeout(
+                () => {
+                    if ($('.delete-book').length < 1) {
+                        $.ajax({
+                            url: form.attr('action'),
+                            success: function (html) {
+                                form.replaceWith(html)
+                            }
+                        });
+                        return false;
+                    }
+                },
+                1000
+            );
             return false;
         });
     });

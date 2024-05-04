@@ -22,7 +22,9 @@ urlpatterns = [
         'review/<int:book_id>/', views.create_review, name='review'
     ),
     path(
-        'review/<int:book_id>/<int:review_id>/', views.change_review, name='change_review'
+        'review/<int:book_id>/<int:review_id>/',
+        views.change_review,
+        name='change_review'
     ),
     path(
         'profile', views.profile, name='profile'
@@ -32,6 +34,9 @@ urlpatterns = [
     ),
     path(
         'cart/<int:buy>/', views.cart, name='cart'
+    ),
+    path(
+        'take_cart_img', views.take_cart_img, name='take_cart_img'
     ),
     path(
         'payment', views.payment, name='payment'

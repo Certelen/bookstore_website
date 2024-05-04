@@ -12,7 +12,7 @@ import uuid
 from yookassa import Payment
 
 from books.models import Book
-from books.views import catalog_type, forms
+from books.views import catalog_type, main_forms
 from .forms import SignupForm, ChangeForm
 from .models import Review, Order
 
@@ -124,7 +124,7 @@ def profile(request):
     context = {
         'change_form': change_form
     }
-    context.update(forms)
+    context.update(main_forms(request))
     return TemplateResponse(request, 'users/profile.html', context)
 
 
@@ -144,8 +144,16 @@ def cart(request, buy=0):
         'price': price,
         'buy': buy
     }
-    context.update(forms)
+    context.update(main_forms(request))
     return TemplateResponse(request, 'users/cart.html', context)
+
+
+def take_cart_img(request, order_full=False):
+    if request.user.is_authenticated:
+        order_full = request.user.order.get(close=False).book.all().exists()
+    return TemplateResponse(
+        request, 'includes/cart_img.html', {'order_full': order_full}
+    )
 
 
 @login_required
@@ -195,7 +203,7 @@ def library(request):
     context = {
         'buyed_books': request.user.buyed_books.all()
     }
-    context.update(forms)
+    context.update(main_forms(request))
     return TemplateResponse(request, 'users/library.html', context)
 
 
