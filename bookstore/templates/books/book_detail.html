@@ -95,7 +95,7 @@
                     </div>
                     <div class="d-flex flex-column">
                         <span style="font-size:25px;">Описание:</span>
-                        <span style="font-size:18px;">{{ book.description }}</span>
+                        <span style="font-size:18px;">{{ book.description|linebreaks }}</span>
                     </div>
                     <div class="d-flex flex-column">
                         <span style="font-size:25px;">Характеристики:</span>
@@ -114,7 +114,7 @@
                     </button>
                     <div class="collapse" id="collapseExample">
                         <div class="p-2 w-100">
-                            {{ book.fragment }}
+                            {{ book.fragment|linebreaks }}
                         </div>
                         <button class="btn w-100 mb-0" style="background-color: #123C69; color: white;" type="button"
                             data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false"
@@ -124,7 +124,9 @@
                     </div>
                 </div>
                 {% if user.is_authenticated %}
-                <div class="d-flex mb-3 p-2 flex-column justify-content-center book_images">
+                <div class="
+                d-flex mb-3 p-2 flex-column justify-content-center book_images
+                " {% if user_have_review %} style="display:none !important" {% endif %}>
                     <form id="comment-form" class="d-flex flex-column" method="post"
                         action="{% url 'users:review' book.id %}">
                         {% csrf_token %}

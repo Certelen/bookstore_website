@@ -29,12 +29,12 @@
                 <div id="sort_links"
                     class="accordion collapse navbar-collapse justify-content-between px-3 mb-4 py-1 rounded-2 sort_links"
                     style="background-color: #BAB2B5;">
-                    <a id="{{ buying }}" class="sort" name="buying" href="#"><span>Популярнее</span></a>
+                    <a id="{{ min_buying }}" class="sort" name="min_buying" href="#"><span>Популярнее</span></a>
                     <a id="{{ min_score }}" class="sort" name="min_score" href="#"><span>По рейтингу</span></a>
-                    <a id="{{ min_price }}" class="sort" name="min_price" href="#"><span>Дороже</span></a>
-                    <a id="{{ price }}" class="sort" name="price" href="#"><span>Дешевле</span></a>
-                    <a id="{{ min_created }}" class="sort" name="min_created" href="#"><span>Позже</span></a>
-                    <a id="{{ created }}" class="sort" name="created" href="#"><span>Раньше</span></a>
+                    <a id="{{ min_total_price }}" class="sort" name="min_total_price" href="#"><span>Дороже</span></a>
+                    <a id="{{ total_price }}" class="sort" name="total_price" href="#"><span>Дешевле</span></a>
+                    <a id="{{ min_release }}" class="sort" name="min_release" href="#"><span>Позже</span></a>
+                    <a id="{{ release }}" class="sort" name="release" href="#"><span>Раньше</span></a>
                 </div>
                 <div class="row">
                     {% for book in page_obj %}

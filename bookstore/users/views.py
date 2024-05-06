@@ -65,13 +65,14 @@ def favorite(request, sort='buying'):
 def create_review(request, book_id):
     """Создание нового отзыва"""
     book = get_object_or_404(Book, id=book_id)
-    if request.method == 'POST':
+    user = request.user
+    if request.method == 'POST' and not book.review.filter(user=user).exists():
         data = request.POST
         score = int(data['score'])
         if 0 >= score > 5:
             score = 5
         Review.objects.create(
-            user=request.user,
+            user=user,
             book=book,
             comment=data['text'],
             score=score
@@ -81,7 +82,7 @@ def create_review(request, book_id):
             book.score = sum(score_list) / len(score_list)
             book.save()
         return JsonResponse(status=HTTPStatus.OK, data={})
-    return reverse_lazy('books:index')
+    return redirect('books:book', book_id=book_id)
 
 
 @login_required

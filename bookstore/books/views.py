@@ -92,8 +92,10 @@ def catalog_type(request, books_list, sort, auth=False, favorite=False):
     elif favorite:
         favorite_books = books_list
 
-    if books_list:
-        books_list = books_list.order_by(
+    if books_list and sort:
+        books_list = books_list.annotate(
+            total_price=(F('price') * (100 - F('discount'))) / 100
+        ).order_by(
             '-' + sort[4:] if 'min_' in sort else sort
         )
     context = {
@@ -137,19 +139,28 @@ def index(request):
     return TemplateResponse(request, 'index.html', context)
 
 
-def search(request, sort='buying'):
+def search(request, sort=''):
     """Поиск"""
     search_form = SearchForm
     data = request.POST
     search_word = data.get('search_word', '')
     books_list = Book.objects.all()
-
+    sort = data.get('sort', '')
     if search_word:
-        books_list = Book.objects.filter(
-            Q(description__iregex=search_word) |
-            Q(author__iregex=search_word) |
-            Q(name__iregex=search_word)
-        )
+        if not sort:
+            books_name_list = Book.objects.filter(
+                name__iregex=search_word
+            ).order_by('-buying')
+            books_author_list = Book.objects.filter(
+                author__iregex=search_word
+            ).order_by('-buying')
+            books_list = list(chain(books_name_list, books_author_list))
+        else:
+            books_list = Book.objects.filter(
+                Q(description__iregex=search_word) |
+                Q(author__iregex=search_word) |
+                Q(name__iregex=search_word)
+            )
         search_form = SearchForm(data=data)
 
     context = catalog_type(request, books_list, sort)
@@ -157,14 +168,14 @@ def search(request, sort='buying'):
     return TemplateResponse(request, 'books/search.html', context)
 
 
-def catalog(request, sort='buying'):
+def catalog(request, sort='min_buying'):
     """Основной каталог"""
     books_list = Book.objects.all()
     context = catalog_type(request, books_list, sort)
     return TemplateResponse(request, 'books/catalog.html', context)
 
 
-def news(request, sort='min_created'):
+def news(request, sort='min_release'):
     """Каталог новых книг"""
     books_list = Book.objects.filter(
         created__gte=date.today() - timedelta(days=NEWBOOK_DAYS))
@@ -188,12 +199,14 @@ def book_detail(request, book_id, book_status=0, book_favorite=0):
             ViewedGenres.objects.create(user=user, genre=genre)
 
     reviews = Review.objects.filter(book=book)
+    user_have_review = reviews.filter(user=user).exists()
     context = {
         'book': book,
         'book_status': book_status,
         'reviews': reviews,
         'book_favorite': book_favorite,
-        'files_format': files_format
+        'files_format': files_format,
+        'user_have_review': user_have_review
     }
     context.update(main_forms(request))
     return TemplateResponse(request, 'books/book_detail.html', context)
