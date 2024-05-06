@@ -181,6 +181,7 @@ class Book(models.Model):
                     break
                 if new_discount < event.discount:
                     new_discount = event.discount
+            book.event.remove(instance)
             book.discount = new_discount
             book.save()
 
