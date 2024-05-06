@@ -63,14 +63,22 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'bookstore.wsgi.application'
 
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.postgresql',
+#        'NAME': os.getenv('DATABASE_NAME', default='postgres'),
+#        'USER': os.getenv('DATABASE_USERNAME', default='postgres'),
+#        'PASSWORD': os.getenv('DATABASE_PASSWORD', default='postgres'),
+#        'HOST': os.getenv('DATABASE_HOST', default='localhost'),
+#        'PORT': os.getenv('DATABASE_PORT', default='5432'),
+#    }
+#}
+
+#Для разработки
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DATABASE_NAME', default='postgres'),
-        'USER': os.getenv('DATABASE_USERNAME', default='postgres'),
-        'PASSWORD': os.getenv('DATABASE_PASSWORD', default='postgres'),
-        'HOST': os.getenv('DATABASE_HOST', default='localhost'),
-        'PORT': os.getenv('DATABASE_PORT', default='5432'),
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
