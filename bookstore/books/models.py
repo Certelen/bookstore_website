@@ -173,7 +173,9 @@ class Book(models.Model):
     def delete_event(sender, instance, **kwargs):
         books = instance.books.all()
         for book in books:
-            book_events = book.event.all().exclude(id=instance.id)
+            book.event.remove(instance)
+            book_events = book.event.all()
+            print(book_events)
             new_discount = 0
             for event in book_events:
                 if instance.discount < event.discount:
@@ -181,7 +183,6 @@ class Book(models.Model):
                     break
                 if new_discount < event.discount:
                     new_discount = event.discount
-            book.event.remove(instance)
             book.discount = new_discount
             book.save()
 
