@@ -121,7 +121,9 @@ def profile(request):
         if change_form.is_valid():
             change_form = change_form.save(commit=False)
             change_form.save()
-            change_form = ChangeForm(instance=user)
+            user.set_password(data['password'])
+            user.save()
+            return redirect('books:index')
     context = {
         'change_form': change_form
     }
@@ -212,5 +214,4 @@ def library(request):
 def get_book(request, book_id, format):
     """Возвращаем ссылку на запрашиваемый формат файла"""
     book = get_object_or_404(request.user.buyed_books, id=book_id)
-    raise ValueError(book.files.all())
-    return redirect('../../../' + book.files.all().get(name=format))
+    return redirect('../../../' + book.files.all().get(name=format).file.url)

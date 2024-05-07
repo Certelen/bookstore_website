@@ -32,12 +32,11 @@ def main_forms(request, order_full=False):
     return forms
 
 
-def filter_books(books_list, data, sort):
+def filter_books(books_list, data):
     """
     Фильтрация книг
     books_list - список книг,
-    data - requst.POST из родительской функции,
-    sort - способ сортировки,
+    data - requst.POST из родительской функции.
     """
     if data.getlist('genres'):
         books_list = books_list.filter(
@@ -53,7 +52,7 @@ def filter_books(books_list, data, sort):
             int(data['pricemax']) if data['pricemax'] else 9999990
         ))
     if data.get('datemin', '') or data.get('datemax', ''):
-        books_list = books_list.filter(created__range=(
+        books_list = books_list.filter(release__range=(
             data['datemin'] if data['datemin'] else date(1000, 1, 1),
             data['datemax'] if data['datemax'] else date(9999, 1, 1)
         ))
@@ -75,17 +74,20 @@ def catalog_type(request, books_list, sort, auth=False, favorite=False):
         'sort': sort
     }
     favorite_books = []
-    if request.method == "POST" and books_list and 'apply_filter' in data:
+    if (request.method == "POST"
+        and books_list
+        and 'apply_filter' in data
+            and sort):
         sort = data.get('sort', sort)
-        books_list = filter_books(books_list, data, sort)
-        post_filter_dict = {
-            'genres': list(map(int, data.getlist('genres'))),
-            'pricemin': data.get('pricemin', ''),
-            'pricemax': data.get('pricemax', ''),
-            'datemin': data.get('datemin', ''),
-            'datemax': data.get('datemax', ''),
-        }
-        filter_dict.update(post_filter_dict)
+        books_list = filter_books(books_list, data)
+    post_filter_dict = {
+        'genres': list(map(int, data.getlist('genres'))),
+        'pricemin': data.get('pricemin', ''),
+        'pricemax': data.get('pricemax', ''),
+        'datemin': data.get('datemin', ''),
+        'datemax': data.get('datemax', ''),
+    }
+    filter_dict.update(post_filter_dict)
 
     if (not auth and user.is_authenticated) or auth:
         favorite_books = user.favorite_books.all().values_list('id', flat=True)
@@ -153,11 +155,13 @@ def search(request, sort=''):
             ).order_by('-buying')
             books_author_list = Book.objects.filter(
                 author__iregex=search_word
-            ).order_by('-buying')
+            ).exclude(id__in=books_name_list.values('id')).order_by('-buying')
+            if 'apply_filter' in data:
+                books_name_list = filter_books(books_name_list, data)
+                books_author_list = filter_books(books_author_list, data)
             books_list = list(chain(books_name_list, books_author_list))
         else:
             books_list = Book.objects.filter(
-                Q(description__iregex=search_word) |
                 Q(author__iregex=search_word) |
                 Q(name__iregex=search_word)
             )
