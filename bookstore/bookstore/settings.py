@@ -13,7 +13,7 @@ SECRET_KEY = (
     'django-insecure-xwep(%5c*4g%f*35i%h+b5xi=-tnpzl225@22t0jj914xq&b!q'
 )
 DEBUG = True
-ALLOWED_HOSTS = ['dch02arv.beget.tech']
+ALLOWED_HOSTS = ['*']
 
 
 INSTALLED_APPS = [
@@ -105,8 +105,7 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = 'static/'
-STATIC_PARENT_DIR = BASE_DIR.parent.parent
-STATIC_ROOT = os.path.join(STATIC_PARENT_DIR, 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_ROOT = os.path.join(STATIC_ROOT, 'media')
 
 
