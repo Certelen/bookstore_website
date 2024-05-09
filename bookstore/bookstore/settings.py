@@ -5,15 +5,15 @@ import os
 
 load_dotenv()
 
-Configuration.account_id = os.getenv('YU_KASSA_ID')
-Configuration.secret_key = os.getenv('YU_KASSA_KEY')
+Configuration.account_id = os.getenv('YU_KASSA_ID', default='ID')
+Configuration.secret_key = os.getenv('YU_KASSA_KEY', default='KEY')
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = (
     'django-insecure-xwep(%5c*4g%f*35i%h+b5xi=-tnpzl225@22t0jj914xq&b!q'
 )
 DEBUG = True
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['dch02arv.beget.tech']
 
 
 INSTALLED_APPS = [
@@ -40,7 +40,6 @@ MIDDLEWARE = [
 
 AUTH_USER_MODEL = 'users.CustomUser'
 ROOT_URLCONF = 'bookstore.urls'
-STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
 
 THUMBNAIL_COLORSPACE = None
 THUMBNAIL_PRESERVE_FORMAT = True
@@ -66,10 +65,10 @@ WSGI_APPLICATION = 'bookstore.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DATABASE_NAME', default='postgres'),
-        'USER': os.getenv('DATABASE_USERNAME', default='postgres'),
-        'PASSWORD': os.getenv('DATABASE_PASSWORD', default='postgres'),
-        'HOST': os.getenv('DATABASE_HOST', default='localhost'),
+        'NAME': os.getenv('DATABASE_NAME', default='default_db'),
+        'USER': os.getenv('DATABASE_USERNAME', default='cloud_user'),
+        'PASSWORD': os.getenv('DATABASE_PASSWORD', default='LSKj&zb7wvz0'),
+        'HOST': os.getenv('DATABASE_HOST', default='fangopirak.beget.app'),
         'PORT': os.getenv('DATABASE_PORT', default='5432'),
     }
 }
@@ -106,7 +105,9 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = 'static/'
-MEDIA_ROOT = os.path.join(STATICFILES_DIRS[0], 'media')
+STATIC_PARENT_DIR = BASE_DIR.parent.parent
+STATIC_ROOT = os.path.join(STATIC_PARENT_DIR, 'static')
+MEDIA_ROOT = os.path.join(STATIC_ROOT, 'media')
 
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

@@ -100,7 +100,7 @@
                     <div class="d-flex flex-column">
                         <span style="font-size:25px;">Характеристики:</span>
                         <span style="font-size:18px;">В книге {{ book.pages }} страниц</span>
-                        <span style="font-size:18px;">Выпущена {{ book.release|date:"d.m.Y" }}</span>
+                        <span style="font-size:18px;">Выпущена {{ book.release }} г.</span>
                         <span style="font-size:18px;">Добавлена на сайт {{ book.created|date:"d.m.Y" }}</span>
                         <span style="font-size:18px;">Для скачивания доступны: {% for format in files_format %}
                             {{format}}{% if not forloop.last %},{% endif %}{% endfor %}</span>

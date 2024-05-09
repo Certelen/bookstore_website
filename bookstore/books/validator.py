@@ -9,8 +9,7 @@ def book_directory_path(instance, filename):
 
 def book_image_directory_path(instance, filename):
     """Создание пути для изображений книг"""
-    return f'books/{unidecode.unidecode(instance.book.name)}/'
-    f'{unidecode.unidecode(filename)}'
+    return f'books/{instance.id}/{unidecode.unidecode(filename)}'
 
 
 def banner_image_directory_path(instance, filename):
