@@ -1,5 +1,7 @@
 # custom
 migrations
+management
+data
 tests.py
 tests
 media

@@ -48,12 +48,10 @@
             data-bs-parent="#accordionExample">
             <div class="accordion-body" style="background-color: #BAB2B5;">
                 <div class="d-flex justify-content-between">
-                    <input type="text" class="form-control text-white me-2" id="DateMin" name="datemin"
-                        placeholder="Начиная с" onfocus="(this.type='date')"
-                        onblur="if(this.value==''){this.type='text'}" value="{{ filter_dict.datemin }}">
-                    <input type="text" class="form-control text-white me-2" id="DateMax" name="datemax"
-                        placeholder="Заканчивая до" onfocus="(this.type='date')"
-                        onblur="if(this.value==''){this.type='text'}" value="{{ filter_dict.datemax }}">
+                    <input type="number" class="form-control text-white me-2" id="DateMin" name="datemin"
+                        placeholder="Начиная с" value="{{ filter_dict.datemin }}">
+                    <input type="number" class="form-control text-white me-2" id="DateMax" name="datemax"
+                        placeholder="Заканчивая до" value="{{ filter_dict.datemax }}">
                 </div>
             </div>
         </div>

@@ -115,5 +115,5 @@ LOGIN_URL = 'books:index'
 
 
 # Переменные-цифры
-NEWBOOK_DAYS = 7
-MAX_BOOKS_ON_SLIDER = 12
+NEWBOOK_DAYS = 7  # Спустя это количество дней книга не считается новой
+MAX_BOOKS_ON_SLIDER = 12  # Количество книг в слайдере на главной

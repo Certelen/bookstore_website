@@ -30,6 +30,7 @@ class SignupForm(UserCreationForm):
 
 class ChangeForm(UserChangeForm):
     def __init__(self, *args, **kwargs):
+        """Запоминаем пользователя для валидации"""
         super(ChangeForm, self).__init__(*args, **kwargs)
         self.instance = kwargs['instance']
 
@@ -57,28 +58,25 @@ class ChangeForm(UserChangeForm):
         )
 
     def clean(self):
-        fields = self.cleaned_data.copy()
-        for field in fields:
-            if not fields[field]:
-                del (self.cleaned_data[field])
-            elif (hasattr(self.instance, field) and
-                    eval('self.instance.' + field) == fields[field]):
-                del (self.cleaned_data[field])
-        UserCreationForm.clean_username(self)
-        password1 = self.cleaned_data.get("password", False)
-        password2 = self.cleaned_data.get("password2", False)
+        """Валидация пароля, почты и ника"""
+        username = password1 = self.cleaned_data["username"]
+        email = self.cleaned_data["email"]
+        if self.instance.username != username:
+            UserCreationForm.clean_username(self)
+        password1 = self.cleaned_data["password"]
+        password2 = self.cleaned_data["password2"]
+        if self.instance.email != email:
+            if User.objects.filter(email=self.cleaned_data['email']).exists():
+                raise ValidationError(
+                    {"email": 'Пользователь с такой почтой уже существует!'}
+                )
         if password1 or password2:
-            if password1 is False:
-                raise ValidationError(
-                    {"password": 'Введите пароль!'}
-                )
-            elif password2 is False:
-                raise ValidationError(
-                    {"password2": 'Введите подтверждение пароля!'}
-                )
-            elif password1 != password2:
+            if password1 != password2:
                 raise ValidationError(
                     {"password": 'Пароли не совпадают',
                      "password2": 'Пароли не совпадают'}
                 )
+        else:
+            del (self.cleaned_data["password"])
+            del (self.cleaned_data["password2"])
         return self.cleaned_data

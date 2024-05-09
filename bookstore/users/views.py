@@ -105,7 +105,9 @@ def change_review(request, book_id, review_id):
         if book.review.all():
             score_list = [review.score for review in book.review.all()]
             book.score = sum(score_list) / len(score_list)
-            book.save()
+        else:
+            book.score = 0
+        book.save()
     return redirect('books:book', book_id=book_id)
 
 
@@ -121,8 +123,9 @@ def profile(request):
         if change_form.is_valid():
             change_form = change_form.save(commit=False)
             change_form.save()
-            user.set_password(data['password'])
-            user.save()
+            if data['password']:
+                user.set_password(data['password'])
+                user.save()
             return redirect('books:index')
     context = {
         'change_form': change_form
@@ -191,7 +194,7 @@ def payment(request):
         },
         "confirmation": {
             "type": "redirect",
-            "return_url": 'http://127.0.0.1:8000/my/payment'
+            "return_url": 'http://dch02arv.beget.tech/my/payment'
         },
         "capture": True
     }, uuid.uuid4())

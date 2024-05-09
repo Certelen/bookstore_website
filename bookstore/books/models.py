@@ -50,8 +50,7 @@ class Event(models.Model):
 
 class Genre(models.Model):
     name = models.CharField(
-        'Название книги',
-        help_text='Название книги',
+        'Название жанра',
         max_length=200,
     )
 
@@ -120,7 +119,7 @@ class Book(models.Model):
     )
     main_image = models.ImageField(
         'Главное изображение книги',
-        upload_to='books/',
+        upload_to=val.book_image_directory_path,
         help_text='Изображение книги в превью',
     )
     buying = models.PositiveIntegerField(
@@ -149,8 +148,12 @@ class Book(models.Model):
             MinValueValidator(0)
         ]
     )
-    release = models.DateField(
-        'Дата выпуска книги'
+    release = models.PositiveIntegerField(
+        'Дата выпуска книги',
+        validators=[
+            MaxValueValidator(9999),
+            MinValueValidator(1000)
+        ]
     )
     created = models.DateField(
         'Дата добавления книги на сайт',
@@ -171,6 +174,12 @@ class Book(models.Model):
 
     @receiver(pre_delete, sender=Event)
     def delete_event(sender, instance, **kwargs):
+        """
+        При удалении скидки проверяется:
+        Если других скидок у книги нет - скидка у книги = 0
+        Если у книги скидки выше чем у удаляемой, то ничего не меняется
+        Если у книги скидки ниже то идет поиск самой высокой и ставится она.
+        """
         books = instance.books.all()
         for book in books:
             book.event.remove(instance)
@@ -189,8 +198,8 @@ class Book(models.Model):
 
 class Banner(models.Model):
     image = models.ImageField(
-        'Изображение банера',
-        upload_to='banners/',
+        'Изображение баннера',
+        upload_to=val.banner_image_directory_path,
         help_text='Желательно 1200x300\
              из которых 600px в середине - зона с информацией'
     )
@@ -208,6 +217,10 @@ class Banner(models.Model):
 
 
 def book_event_change(instance, action, pk_set, **kwargs):
+    """
+    При создании m2m модели между акцией и книгой устанавливается скидка,
+    если у книги нет большей скидки.
+    """
     if action == "post_add":
         copy_pk_set = pk_set.copy()
         while copy_pk_set:

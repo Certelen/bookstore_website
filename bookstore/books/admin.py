@@ -14,6 +14,11 @@ class BookFilesInline(admin.TabularInline):
 
 class EventForm(forms.ModelForm):
     def clean(self):
+        """
+        Если указана цель жанры или все книги,
+        для каждой книги в жанре или всех книг
+        создается m2m модель.
+        """
         data = self.cleaned_data
         if 'event_on' not in data:
             raise ValidationError(
@@ -30,7 +35,6 @@ class EventForm(forms.ModelForm):
 @admin.register(Book)
 class BookAdmin(admin.ModelAdmin):
     inlines = [BookFilesInline]
-    readonly_fields = ('id',)
 
 
 @admin.register(Event)
@@ -42,6 +46,7 @@ class EventAdmin(admin.ModelAdmin):
         return False
 
     def get_form(self, request, obj=None, change=False, **kwargs):
+        """При выборе одной цели не показываются другие после сохранения"""
         self.exclude = []
         if obj is not None:
             exclude = ['books', 'genres', 'all_books']

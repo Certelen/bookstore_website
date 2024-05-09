@@ -76,6 +76,12 @@ class CustomUser(AbstractUser):
 
     @receiver(post_save, sender=ViewedGenres)
     def user_view_book_page(sender, instance, created, **kwargs):
+        """
+        После посещения пользователем страницы книги,
+        его список жанров изменяется.
+        Список ограничивается 20 жанрами и при переполнении
+        удаляет старые просмотренные жанры.
+        """
         if created:
             user = instance.user
             user.most_viewed_genres = Genre.objects.get(
@@ -171,5 +177,6 @@ class Order(models.Model):
 
     @receiver(post_save, sender=CustomUser)
     def create_first_user_order(sender, instance, created, **kwargs):
+        """После регистрации создается первый незакрытый заказ - его корзина"""
         if created:
             Order.objects.create(user=instance)

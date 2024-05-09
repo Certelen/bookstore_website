@@ -53,8 +53,8 @@ def filter_books(books_list, data):
         ))
     if data.get('datemin', '') or data.get('datemax', ''):
         books_list = books_list.filter(release__range=(
-            data['datemin'] if data['datemin'] else date(1000, 1, 1),
-            data['datemax'] if data['datemax'] else date(9999, 1, 1)
+            data['datemin'] if data['datemin'] else 0,
+            data['datemax'] if data['datemax'] else 9999
         ))
     return books_list
 
@@ -80,14 +80,14 @@ def catalog_type(request, books_list, sort, auth=False, favorite=False):
             and sort):
         sort = data.get('sort', sort)
         books_list = filter_books(books_list, data)
-    post_filter_dict = {
-        'genres': list(map(int, data.getlist('genres'))),
-        'pricemin': data.get('pricemin', ''),
-        'pricemax': data.get('pricemax', ''),
-        'datemin': data.get('datemin', ''),
-        'datemax': data.get('datemax', ''),
-    }
-    filter_dict.update(post_filter_dict)
+        post_filter_dict = {
+            'genres': list(map(int, data.getlist('genres'))),
+            'pricemin': data.get('pricemin', ''),
+            'pricemax': data.get('pricemax', ''),
+            'datemin': data.get('datemin', ''),
+            'datemax': data.get('datemax', ''),
+        }
+        filter_dict.update(post_filter_dict)
 
     if (not auth and user.is_authenticated) or auth:
         favorite_books = user.favorite_books.all().values_list('id', flat=True)
@@ -134,7 +134,7 @@ def index(request):
         'popular': popular[:MAX_BOOKS_ON_SLIDER],
         'new': new[:MAX_BOOKS_ON_SLIDER],
         'recomended': recomended[:MAX_BOOKS_ON_SLIDER],
-        'banners': Banner.objects.all(),
+        'banners': Banner.objects.filter(close=False),
         'favorite_books': favorite_books
     }
     context.update(main_forms(request))
