@@ -194,7 +194,7 @@ def payment(request):
         },
         "confirmation": {
             "type": "redirect",
-            "return_url": 'http://127.0.0.1:8000/my/payment'
+            "return_url": 'http://dch02arv.beget.tech/my/payment'
         },
         "capture": True
     }, uuid.uuid4())
