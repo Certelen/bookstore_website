@@ -49,13 +49,6 @@
     });
 </script>
 {% endif %}
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{% url 'books:index' %}">Главная</a></li>
-        <li class="breadcrumb-item"><a href="{% url 'books:catalog' %}">Каталог</a></li>
-        <li class="breadcrumb-item active" aria-current="page">{{ book.name }}</li>
-    </ol>
-</nav>
 <div class="row">
     <div class="col-12 background-after" style="height: unset;">
         <div class="row">

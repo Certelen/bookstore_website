@@ -1,13 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
-
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{% url 'books:index' %}">Главная</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Профиль</li>
-    </ol>
-</nav>
 <div class="row">
     <div class="col-12 col-lg-4 background-after" style="height: min-content;">
         <form id="form-profile" class="text-center" method="post" action="{% url 'users:profile'%}">
