@@ -107,7 +107,7 @@ USE_TZ = True
 
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATIC_URL = 'static/'
-# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static') Для сервера
 MEDIA_ROOT = os.path.join(STATICFILES_DIRS[0], 'media')
 
 
@@ -117,5 +117,15 @@ LOGIN_URL = 'books:index'
 
 
 # Переменные-цифры
+DOMEN = os.getenv('DOMEN', default='http://127.0.0.1:8000')
 NEWBOOK_DAYS = 7  # Спустя это количество дней книга не считается новой
 MAX_BOOKS_ON_SLIDER = 12  # Количество книг в слайдере на главной
+MAX_ORDERS_PROFILE = 5  # Количество заказов в профиле на страницу
+
+# Настройка почты
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv('EMAIL_LOGIN')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_PASSWORD')

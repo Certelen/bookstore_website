@@ -184,7 +184,6 @@ class Book(models.Model):
         for book in books:
             book.event.remove(instance)
             book_events = book.event.all()
-            print(book_events)
             new_discount = 0
             for event in book_events:
                 if instance.discount < event.discount:

@@ -39,9 +39,6 @@ def filter_books(books_list, data):
     data - requst.POST из родительской функции.
     """
     if data.getlist('genres'):
-        books_list = books_list.filter(
-            genre=data.getlist('genres').pop()
-        )
         for search_genre in data.getlist('genres'):
             books_list = books_list.filter(genre=search_genre)
     if data.get('pricemin', '') or data.get('pricemax', ''):
@@ -88,18 +85,19 @@ def catalog_type(request, books_list, sort, auth=False, favorite=False):
             'datemax': data.get('datemax', ''),
         }
         filter_dict.update(post_filter_dict)
-
     if (not auth and user.is_authenticated) or auth:
-        favorite_books = user.favorite_books.all().values_list('id', flat=True)
-    elif favorite:
-        favorite_books = books_list
-
+        if favorite:
+            favorite_books = books_list
+        else:
+            favorite_books = user.favorite_books.all().values_list(
+                'id', flat=True)
     if books_list and sort:
         books_list = books_list.annotate(
             total_price=(F('price') * (100 - F('discount'))) / 100
         ).order_by(
             '-' + sort[4:] if 'min_' in sort else sort
         )
+
     context = {
         'page_obj': books_list,
         'genres': Genre.objects.all(),
@@ -114,15 +112,14 @@ def catalog_type(request, books_list, sort, auth=False, favorite=False):
 def index(request):
     """Главная"""
     user = request.user
-    popular = Book.objects.all().order_by('-buying')
+    popular = Book.objects.all().order_by(
+        '-buying')
     new = Book.objects.filter(
         created__gte=date.today() - timedelta(days=NEWBOOK_DAYS))
     recomended = Book.objects.all().order_by('-score')
     favorite_books = None
-
     if not new:
         new = Book.objects.order_by('created')
-
     if user.is_authenticated:
         if user.viewed_genres:
             user_recomended = popular.filter(genre=user.most_viewed_genres)
@@ -183,16 +180,23 @@ def news(request, sort='min_release'):
     """Каталог новых книг"""
     books_list = Book.objects.filter(
         created__gte=date.today() - timedelta(days=NEWBOOK_DAYS))
+
     context = catalog_type(request, books_list, sort)
     return TemplateResponse(request, 'books/news.html', context)
 
 
-def book_detail(request, book_id, book_status=0, book_favorite=0):
+def book_detail(
+    request,
+    book_id,
+    book_status=0,
+    book_favorite=0,
+    user_have_review=False
+):
     """Страница книги"""
     user = request.user
     book = get_object_or_404(Book, id=book_id)
     files_format = book.files.all().values_list('name', flat=True)
-
+    reviews = Review.objects.filter(book=book)
     if user.is_authenticated:
         order = user.order.filter(close=False)[0]
         book_status = 2 if user.buyed_books.filter(id=book_id) else 0
@@ -201,9 +205,8 @@ def book_detail(request, book_id, book_status=0, book_favorite=0):
         book_favorite = 1 if user.favorite_books.filter(id=book_id) else 0
         for genre in book.genre.all():
             ViewedGenres.objects.create(user=user, genre=genre)
+        user_have_review = reviews.filter(user=user).exists()
 
-    reviews = Review.objects.filter(book=book)
-    user_have_review = reviews.filter(user=user).exists()
     context = {
         'book': book,
         'book_status': book_status,
@@ -221,13 +224,14 @@ def change_favorite(request, book_favorite=0):
     """Добавление или удаление из избранного на карточках и странице товара"""
     if request.method == "POST":
         user = request.user
-        book = Book.objects.get(id=request.POST['book'])
+        book = get_object_or_404(Book, id=request.POST['book'])
         favorite_books = user.favorite_books.all().filter(id=book.id)
         if favorite_books:
             user.favorite_books.remove(book)
         else:
             user.favorite_books.add(book)
             book_favorite = 1
+
         context = {
             'book': book,
             'book_favorite': book_favorite,
@@ -249,6 +253,7 @@ def change_cart(request, book_status=0):
         user = request.user
         book = get_object_or_404(Book, id=request.POST['book'])
         if user.buyed_books.filter(id=book.id):
+
             context = {
                 'book': book,
                 'book_status': 2
@@ -262,6 +267,7 @@ def change_cart(request, book_status=0):
         else:
             book_status = 1
             order.book.add(book)
+
         context = {
             'book': book,
             'book_status': book_status

@@ -2,6 +2,7 @@ from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django import forms
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
+import re
 
 
 User = get_user_model()
@@ -59,8 +60,18 @@ class ChangeForm(UserChangeForm):
 
     def clean(self):
         """Валидация пароля, почты и ника"""
-        username = password1 = self.cleaned_data["username"]
+        username = self.cleaned_data["username"]
         email = self.cleaned_data["email"]
+        first_name = self.cleaned_data["first_name"]
+        last_name = self.cleaned_data["last_name"]
+        if re.search(r'[^а-яА-ЯёЁ]', first_name):
+            raise ValidationError(
+                {"first_name": 'Имя должно содержать только русские буквы!'}
+            )
+        if re.search(r'[^а-яА-ЯёЁ]', last_name):
+            raise ValidationError(
+                {"last_name": 'Фамилия должна содержать только русские буквы!'}
+            )
         if self.instance.username != username:
             UserCreationForm.clean_username(self)
         password1 = self.cleaned_data["password"]

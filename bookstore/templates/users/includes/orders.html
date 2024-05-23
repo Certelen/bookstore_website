@@ -1,0 +1,35 @@
+<div id="orders" class="text-center">
+    <span class="mp-3" style="font-size: 25px; font-weight: 600;">Заказы</span>
+    <div class="mp-1 p-3 rounded-3" style="border: 2px #123C69 solid">
+        {% for order in page_obj %}
+        <div class="row delete-book d-flex rounded-3 mt-3 mx-0" style="border: 2px #123C69 solid; overflow: hidden;">
+            <div class="col-12 d-flex px-0 text-center"
+                style="background-color: #EEE2DC; border-bottom: 2px #123C69 solid;">
+                <span style="font-size: 20px; width: 100%;">Заказ #{{user.id}}-{{order.id}}</span>
+            </div>
+            <div class="col-12 col-lg-7 d-flex px-0 align-items-center" style="background-color: #EEE2DC; ">
+                <div class="px-2 w-100" style="text-align: start;">
+                    {% for book in order.book.all %}
+                    <a href="{% url 'books:book' book.id %}">
+                        <p>{{ book.name }}</p>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="col-12 col-lg-5 d-flex flex-column px-0s align-items-center text-center mb-1">
+                <div>
+                    <span style="font-size: 16px; font-weight: 600;">Оплачено:</span>
+                    <span>{{ order.close_data }}</span>
+                </div>
+                <div>
+                    <span style="font-size: 16px; font-weight: 600;">На сумму:</span>
+                    <span>{{ order.amount }} рублей</span>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <h2 class="text-center">Еще ничего не куплено</h2>
+        {% endfor %}
+    </div>
+    {% include 'includes/paginator.html' %}
+</div>

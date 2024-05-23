@@ -29,12 +29,29 @@
                 <div id="sort_links"
                     class="accordion collapse navbar-collapse justify-content-between px-3 mb-4 py-1 rounded-2 sort_links"
                     style="background-color: #BAB2B5;">
-                    <a id="{{ min_buying }}" class="sort" name="min_buying" href="#"><span>Популярнее</span></a>
-                    <a id="{{ min_score }}" class="sort" name="min_score" href="#"><span>По рейтингу</span></a>
-                    <a id="{{ min_total_price }}" class="sort" name="min_total_price" href="#"><span>Дороже</span></a>
-                    <a id="{{ total_price }}" class="sort" name="total_price" href="#"><span>Дешевле</span></a>
-                    <a id="{{ min_release }}" class="sort" name="min_release" href="#"><span>Позже</span></a>
-                    <a id="{{ release }}" class="sort" name="release" href="#"><span>Раньше</span></a>
+                    <div class="dropdown">
+                        <button id="{{ min_buying }}{{ min_score }}" class="btn btn-secondary dropdown-toggle"
+                            type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false"
+                            style="background-color: unset; color: black; border: unset;">
+                            По известности
+                        </button>
+                        <ul class="dropdown-menu px-3" aria-labelledby="dropdownMenuButton1">
+                            <li><a id="{{ min_buying }}" class="sort" name="min_buying" href="#">
+                                    <span>Популярнее</span></a></li>
+                            <li><a id="{{ min_score }}" class="sort" name="min_score" href="#"><span>По
+                                        рейтингу</span></a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <span id="{{ min_total_price }}{{ total_price }}">По цене</span>
+                        {% if min_total_price %}
+                        <a class="sort" name="total_price" href="#"><img src="{% static 'icons/arrow.svg' %}"></img></a>
+                        {% else %}
+                        <a class="sort" name="min_total_price" href="#"><img src="{% static 'icons/arrow.svg' %}"
+                                style="transform: rotate(180deg)"></img></a>
+
+                        {% endif %}
+                    </div>
                 </div>
                 <div class="row">
                     {% for book in page_obj %}

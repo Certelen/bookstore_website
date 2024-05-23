@@ -9,7 +9,7 @@
     </ol>
 </nav>
 <div class="row">
-    <div class="offset-0 offset-lg-3 col-12 col-lg-6 background-after" style="height: unset;">
+    <div class="col-12 col-lg-4 background-after" style="height: min-content;">
         <form id="form-profile" class="text-center" method="post" action="{% url 'users:profile'%}">
             {% csrf_token %}
             <span class="mp-3" style="font-size: 25px; font-weight: 600;">Личный кабинет</span>
@@ -21,7 +21,7 @@
                 {% endfor %}
                 <div class="row">
                     {% for field in change_form %}
-                    <div class="col-12 col-lg-6 d-flex flex-column mb-4 justify-content-end">
+                    <div class="col-12 d-flex flex-column mb-4 justify-content-end">
                         {% for error in field.errors %}
                         <div class="alert alert-danger mb-0">
                             {{ error|escape }}
@@ -30,7 +30,6 @@
                         <label class="mb-1" style="font-size: 18px;">{{ field.label }}</label>
                         {{ field }}
                     </div>
-
                     {% endfor %}
                 </div>
                 <div class="d-flex justify-content-between mt-3">
@@ -46,6 +45,9 @@
                 </div>
             </div>
         </form>
+    </div>
+    <div class="offset-0 offset-lg-2 col-lg-6 background-after" style="height: min-content;">
+        {% include 'users/includes/orders.html' %}
     </div>
 </div>
 

@@ -140,10 +140,10 @@ class Order(models.Model):
         related_name='order',
         verbose_name='Заказ пользователя',
     )
-    buying = models.BooleanField(
-        'Факт совершения покупки',
-        help_text='Факт совершения покупки',
-        default=False,
+    amount = models.PositiveIntegerField(
+        'Цена заказа',
+        help_text='Цена заказа',
+        default=0
     )
     book = models.ManyToManyField(
         Book,
@@ -158,8 +158,8 @@ class Order(models.Model):
         null=True
     )
     close = models.BooleanField(
-        'Возможность изменять заказ',
-        help_text='Возможность изменять заказ',
+        'Заказ оплачен',
+        help_text='Заказ оплачен',
         default=False,
     )
     close_data = models.DateField(

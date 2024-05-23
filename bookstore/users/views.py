@@ -5,16 +5,20 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.http import JsonResponse
+from django.core.mail import send_mail
 from http import HTTPStatus
 from django.contrib.auth.forms import AuthenticationForm
 from django.http import HttpResponseRedirect
 import uuid
+from django.core.paginator import Paginator
 from yookassa import Payment
+from datetime import date
 
 from books.models import Book
 from books.views import catalog_type, main_forms
 from .forms import SignupForm, ChangeForm
 from .models import Review, Order
+from bookstore.settings import MAX_ORDERS_PROFILE, EMAIL_HOST_USER, DOMEN
 
 
 def signup(request):
@@ -25,6 +29,7 @@ def signup(request):
             new_user = form.save()
             auth.login(request, new_user)
             return JsonResponse(status=HTTPStatus.OK, data={'login': True})
+
         context = {
             'signup_form': form
         }
@@ -37,8 +42,10 @@ def login(request):
     if request.method == "POST":
         form = AuthenticationForm(data=request.POST)
         if form.is_valid():
+
             auth.login(request, form.get_user())
             return JsonResponse(status=HTTPStatus.OK, data={'login': True})
+
         context = {
             'auth_form': form
         }
@@ -116,19 +123,35 @@ def profile(request):
     """Профиль"""
     user = request.user
     change_form = ChangeForm(instance=user)
+    orders = user.order.filter(close=True)
+    paginator = Paginator(orders, MAX_ORDERS_PROFILE)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    orders_amount = []
+    amount = 0
+    for order in page_obj:
+        for book in order.book.all():
+            amount += book.price * (100 - book.discount) / 100
+        orders_amount.append(amount)
     if request.method == 'POST':
         data = request.POST
         change_form = ChangeForm(
             data=data, instance=user)
+
         if change_form.is_valid():
+
             change_form = change_form.save(commit=False)
             change_form.save()
             if data['password']:
+
                 user.set_password(data['password'])
                 user.save()
             return redirect('books:index')
+
     context = {
-        'change_form': change_form
+        'page_obj': page_obj,
+        'change_form': change_form,
+        'orders_amount': orders_amount
     }
     context.update(main_forms(request))
     return TemplateResponse(request, 'users/profile.html', context)
@@ -145,6 +168,7 @@ def cart(request, buy=0):
     price = sum(books_order.annotate(
         total_price=(F('price') * (100 - F('discount'))) / 100
     ).values_list('total_price', flat=True))
+
     context = {
         'books_order': books_order,
         'price': price,
@@ -171,19 +195,32 @@ def payment(request):
     order = user.order.filter(close=False)[0]
     if order.payment:
         if 'succeeded' == Payment.find_one(order.payment).status:
+            html_message = (f'Вы успешно оплатили заказ на '
+                            f'<a href="{DOMEN}">сайте</a>!<br>'
+                            'Нажмите на формат для скачивания книги:<br><br>')
             for book in order.book.all():
                 user.buyed_books.add(book)
+                html_message += f'{book.name}:<br>'
+                for file in book.files.all():
+                    html_message += (f'&emsp;<a href="{DOMEN}{file.file.url}">'
+                                     f'{file.name}</a><br>')
+            send_mail(subject=f'Заказ #{user.id}-{order.id} оплачен',
+                      message=None,
+                      from_email=EMAIL_HOST_USER,
+                      recipient_list=[user.email],
+                      html_message=html_message)
             order.close = True
+            order.close_data = date.today()
             Order.objects.create(user=user)
             book.buying += 1
             book.save()
             buy = 2
         else:
             order.payment = ''
+            order.amount = 0
             buy = 1
         order.save()
         return redirect('users:cart', buy=buy)
-
     price = sum(order.book.annotate(
         total_price=(F('price') * (100 - F('discount'))) / 100
     ).values_list('total_price', flat=True))
@@ -194,11 +231,13 @@ def payment(request):
         },
         "confirmation": {
             "type": "redirect",
-            "return_url": 'http://dch02arv.beget.tech/my/payment'
+            "return_url": f'{DOMEN}/my/payment'
+
         },
         "capture": True
     }, uuid.uuid4())
     order.payment = payment.id
+    order.amount = price
     order.save()
     return HttpResponseRedirect(payment.confirmation.confirmation_url)
 
